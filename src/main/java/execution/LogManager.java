@@ -18,8 +18,8 @@ public class LogManager {
     }
 
     public void insertLog(){
-        //TODO append-only logging?w
-
+        //TODO append-only logging?
+        //TODO parallelize inserting using a log buffer?
     }
 
     public void deleteLog(){

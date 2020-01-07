@@ -23,7 +23,7 @@ public class Transaction {
     int threadId_; // which thread is executing this tranx
     long epochId_;
     long timestamp_; // when the transaction began
-    ReadWriteSet rwSet_;
+    ReadWriteSet rwSet_;//TODO  split read and write set?
     ResultType result_ = ResultType.SUCCESS;
     List<String> queryStrings_; //list of queries. Need to compiled to EMP code before submitting to server for execution
 
@@ -35,6 +35,11 @@ public class Transaction {
     public TransactionId getTxnId_(){
         return txnId_;
     }
+
+    public ReadWriteSet getRwSet() {
+        return rwSet_;
+    }
+
 
     public boolean commit() throws IOException{
         //TODO persist updates here

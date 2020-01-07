@@ -11,7 +11,6 @@ public class Server {
 //    SecretShareStorage storageA_;
 //    SecretShareStorage storageB_;
     TranxManager tranxManager_;
-    BatchManager batchManager_;
     HashMap<String, OPRAM> opramMap_;
     TranxQueue tranxQueue_;
 

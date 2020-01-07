@@ -9,6 +9,7 @@ public class LogRecord {
     //TODO we can use unsigned int instead
     long epochId_;
     LogRecordId logRecordId_;
+    int tableId;
     int tuplePos_; // log data
     LogRecordType logRecordType_;
 
