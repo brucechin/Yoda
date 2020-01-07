@@ -12,15 +12,15 @@ public class TranxQueue {
     Queue<Transaction> queue_;
     Lock lock_;
 
-    void tranxReorder(int len){
+    public void tranxReorder(int len){
         //reorder the order of top len transactions in the queue to minimize the potential conflicts
     }
 
-    void receiveTranx(){
+    public void receiveTranx(){
         //should work in the background consistently
     }
 
-    boolean insertTranx(Transaction t){
+    public boolean insertTranx(Transaction t){
         //concurrently insert transactions to queue.
         //TODO use thread-safe queue to implement it lock-free
         lock_.lock();
@@ -29,11 +29,11 @@ public class TranxQueue {
         return true;
     }
 
-    boolean isEmpty(){
+    public boolean isEmpty(){
         return queue_.isEmpty();
     }
 
-    List<Transaction> submitToBatchManager(int num){
+    public List<Transaction> submitToBatchManager(int num){
         List<Transaction> list = new ArrayList<>();
         int count = 0;
         lock_.lock();
