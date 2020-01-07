@@ -12,7 +12,6 @@ public class Server {
 //    SecretShareStorage storageB_;
     TranxManager tranxManager_;
     HashMap<String, OPRAM> opramMap_;
-    TranxQueue tranxQueue_;
 
     public Server(){
 

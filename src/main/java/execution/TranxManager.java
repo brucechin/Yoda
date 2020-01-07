@@ -10,7 +10,7 @@ public class TranxManager {
     LogManager logManager_;
     EpochManager epochManager_;
     List<Transaction> curTranxs_; //actively executing transactions
-
+    TranxQueue queue_;
 
     public void recordTranxStats(Transaction t){
         //TODO collect stats of tranx's read write operations
