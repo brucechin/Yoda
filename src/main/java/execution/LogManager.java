@@ -34,4 +34,8 @@ public class LogManager {
 
     }
 
+    public void recovery(){
+
+    }
+
 }

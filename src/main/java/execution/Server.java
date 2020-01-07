@@ -14,5 +14,19 @@ public class Server {
     HashMap<String, OPRAM> opramMap_;
     TranxQueue tranxQueue_;
 
+    public Server(){
 
+    }
+
+    public void start(){
+
+    }
+
+    public void stop(){
+
+    }
+
+    public void statistics(){
+        //TODO collect some stats of executions
+    }
 }

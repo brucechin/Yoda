@@ -1,10 +1,6 @@
 package utils;
 
-import execution.LogRecord;
-import javafx.util.Pair;
-
 import java.util.HashMap;
-import java.util.List;
 
 enum RWType{
     INVALID,
