@@ -1,6 +1,6 @@
 package execution;
 
-import utils.ReadWriteSet;
+import execution.generator.TpccGen;
 import utils.Transaction;
 
 import java.util.List;
@@ -12,6 +12,7 @@ public class TranxManager {
     List<Transaction> curTranxs_; //actively executing transactions
     TranxQueue queue_;
     BatchManager batchManager_;
+    TpccGen generator_;
     public void recordTranxStats(Transaction t){
         //TODO collect stats of tranx's read write operations
     }
@@ -26,13 +27,15 @@ public class TranxManager {
 
     }
 
-    public void abortTranx(Transaction t){
+    public void abortTranx(Transaction t) {
 
     }
 
-    public void recovery(){
+    public void recovery() {
         //use logManager for failure recovery
     }
 
-
+    public void tranxArrival() {
+        //an individual thread to generating transactions and push_back to tranxQueue
+    }
 }

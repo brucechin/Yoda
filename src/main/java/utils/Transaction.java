@@ -16,10 +16,17 @@ enum ResultType {
     TO_ABORT
 };
 
+enum TransactionPhase {
+    READ,
+    COMPUTE,
+    WRITE
+};
+
 public class Transaction {
     private final TransactionId txnId_;
     boolean is_written_; // if tranx has write op
     boolean read_only_ = false;
+    private TransactionPhase phase_;
     int threadId_; // which thread is executing this tranx
     long epochId_;
     long timestamp_; // when the transaction began
@@ -28,11 +35,13 @@ public class Transaction {
     List<String> queryStrings_; //list of queries. Need to compiled to EMP code before submitting to server for execution
 
 
-    public Transaction(){
+    //TODO where to store the intermediate query results, in this Transaction?
+
+    public Transaction() {
         txnId_ = new TransactionId();
     }
 
-    public TransactionId getTxnId_(){
+    public TransactionId getTxnId_() {
         return txnId_;
     }
 
