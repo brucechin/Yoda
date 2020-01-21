@@ -2,7 +2,7 @@ package utils;
 
 import java.util.List;
 
-public class Table {
+public class Table implements Runnable {
     String tableName_;
     private int size_;//size of tuple
     private int count_;//number of tuples
@@ -21,6 +21,9 @@ public class Table {
         for (Tuple t : src.tuples_) {
             tuples_.add(t);
         }
+    }
+    public void run(){
+
     }
 
     public List<Tuple> tuples() {

@@ -5,13 +5,15 @@ import utils.Tuple;
 import java.util.HashMap;
 import java.util.List;
 
-public class OPRAM {
+public class ORAM {
     HashMap<Integer, Integer> positionMap;
     List<Tuple> stash;
 
-    public OPRAM(){
+    public ORAM(){
 
     }
+
+
 
 
 }

@@ -11,6 +11,7 @@ public class SecretShareStorage {
     private List<String> dataOwners_;
     private Integer party_;
     private HashMap<String, Table> data_;//tablename -> table. table contains EMP secret shares for MPC execution
+    private String ipAdrr_;
 
     //TODO add JDBC connection variables for extracting secret shares from data owners.
 
