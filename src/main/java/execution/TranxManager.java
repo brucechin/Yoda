@@ -11,7 +11,7 @@ public class TranxManager {
     EpochManager epochManager_;
     List<Transaction> curTranxs_; //actively executing transactions
     TranxQueue queue_;
-
+    BatchManager batchManager_;
     public void recordTranxStats(Transaction t){
         //TODO collect stats of tranx's read write operations
     }

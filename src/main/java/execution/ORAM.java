@@ -1,19 +1,36 @@
 package execution;
 
+import storage.SecretShareStorage;
 import utils.Tuple;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class ORAM {
-    HashMap<Integer, Integer> positionMap;
-    List<Tuple> stash;
+    HashMap<Integer, Integer> positionMap_;
+    List<Tuple> stash_;
+    SecretShareStorage secretShareStorage_;
 
     public ORAM(){
 
     }
 
+    public void read(){
 
+    }
+
+    public void update(){
+
+    }
+
+    public void insert(){
+
+    }
+
+    public void delete(){
+
+
+    }
 
 
 }
