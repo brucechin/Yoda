@@ -22,17 +22,11 @@ public class LogManager {
         //TODO parallelize inserting using a log buffer?
     }
 
-    public void deleteLog(){
-
-    }
 
     public void startCheckpointing(){
 
     }
 
-    public void stopCheckpointing(){
-
-    }
 
     public void recovery(){
 

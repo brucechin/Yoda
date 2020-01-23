@@ -16,9 +16,6 @@ public class TranxQueue {
         //reorder the order of top len transactions in the queue to minimize the potential conflicts
     }
 
-    public void receiveTranx(){
-        //should work in the background consistently
-    }
 
     public boolean insertTranx(Transaction t){
         //concurrently insert transactions to queue.
@@ -33,11 +30,11 @@ public class TranxQueue {
         return queue_.isEmpty();
     }
 
-    public List<Transaction> submitToBatchManager(int num){
+    public List<Transaction> popTransactions(int num) {
         List<Transaction> list = new ArrayList<>();
         int count = 0;
         lock_.lock();
-        while(!queue_.isEmpty() && count < num){
+        while (!queue_.isEmpty() && count < num) {
             Transaction t = queue_.poll();
             list.add(t);
         }

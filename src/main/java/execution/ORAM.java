@@ -19,18 +19,8 @@ public class ORAM {
 
     }
 
-    public void update(){
+    public void write() {
 
     }
-
-    public void insert(){
-
-    }
-
-    public void delete(){
-
-
-    }
-
 
 }

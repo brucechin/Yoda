@@ -9,9 +9,10 @@ public class BatchManager {
     private List<Transaction> runningTranx;
     private Queue<String> operationQueue; //I/O operations waiting for submitting to ORAM servers for execution
     private int batchSize;
-    ORAMThreadPool threadPool_; // use this thread pool to execute query tasks.
+    TranxQueue queue_;
 
-    BatchManager(){
+
+    BatchManager() {
 
     }
 
@@ -23,12 +24,12 @@ public class BatchManager {
         //add t to runningTranx, insert its I/O operations to operationQueue too.
     }
 
-    public void executeOneEpoch() {
-        //use up all available ORAMs for execution
+    public void commitTranx(Transaction t) {
 
-        //if any running transaction finishes its reading phase, do its compute phase here
+    }
 
-        //for transaction committing phase
+    public void abortTranx(Transaction t) {
+
     }
 
 

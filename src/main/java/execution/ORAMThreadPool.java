@@ -10,19 +10,36 @@ public class ORAMThreadPool <Job extends Runnable> {
     private boolean running_;
     private List<ORAM> oramExecutors_;
 
-    public ORAMThreadPool(){
+    public ORAMThreadPool() {
 
     }
 
-    public void execute(Job j){
+    public void read() {
 
     }
 
-    public void shutdown(){
+    public void update() {
 
     }
 
-    public void start(){
+    public void insert() {
+
+    }
+
+    public void delete() {
+
+
+    }
+
+    public void execute(Job j) {
+
+    }
+
+    public void shutdown() {
+
+    }
+
+    public void start() {
 
     }
 }

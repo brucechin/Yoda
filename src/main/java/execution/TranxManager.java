@@ -3,14 +3,10 @@ package execution;
 import execution.generator.TpccGen;
 import utils.Transaction;
 
-import java.util.List;
-
 public class TranxManager {
     //TODO use th data from logManager or epochManger for validation phase?
     LogManager logManager_;
     EpochManager epochManager_;
-    List<Transaction> curTranxs_; //actively executing transactions
-    TranxQueue queue_;
     BatchManager batchManager_;
     TpccGen generator_;
     public void recordTranxStats(Transaction t){
@@ -23,13 +19,6 @@ public class TranxManager {
         return true;
     }
 
-    public void commitTranx(Transaction t){
-
-    }
-
-    public void abortTranx(Transaction t) {
-
-    }
 
     public void recovery() {
         //use logManager for failure recovery

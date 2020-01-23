@@ -1,24 +1,24 @@
 package execution;
 
-import utils.Epoch;
-
 import java.io.IOException;
-import java.util.List;
+import java.util.Queue;
 
 public class EpochManager {
-    List<Epoch> pastEpoches_;
     int curEpochId_;
     private boolean isRunning_;
+    ORAMThreadPool threadPool_; // use this thread pool to execute query tasks.
+    Queue<String> epochQueue; //epoches of operations waiting for execution
+
     //TODO we can have a read write logging for each epoch here for validation?
-    public int getCurEpochId(){
+    public int getCurEpochId() {
         return curEpochId_;
     }
 
-    public void incrementEpochId() throws IOException{
+    public void incrementEpochId() throws IOException {
         //TODO use atomic incremental op
-        if(isRunning_){
+        if (isRunning_) {
             curEpochId_++;
-        }else{
+        } else {
             try{
                 epochEnd();
             }catch (IOException e){
@@ -38,4 +38,5 @@ public class EpochManager {
         //TODO check if all operations within this epoch have finished
         isRunning_ = false;
     }
+
 }
