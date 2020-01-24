@@ -1,4 +1,4 @@
-package org.yoda.execution;
+package org.yoda.storage;
 
 import org.yoda.storage.SecretShareStorage;
 import org.yoda.utils.Tuple;
