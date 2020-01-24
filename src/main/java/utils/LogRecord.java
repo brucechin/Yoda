@@ -1,7 +1,8 @@
 package utils;
+
 import types.LogRecordId;
 
-enum LogRecordType{
+enum LogRecordType {
     READ, WRITE
 }
 
@@ -13,27 +14,27 @@ public class LogRecord {
     int tuplePos_; // log data
     LogRecordType logRecordType_;
 
-    LogRecord(){
+    LogRecord() {
 
     }
 
-    void setEpochId(long eid){
+    void setEpochId(long eid) {
         epochId_ = eid;
     }
 
-    void getLogRecordId(LogRecordId lid){
+    void getLogRecordId(LogRecordId lid) {
         logRecordId_ = lid;
     }
 
-    long getEpochId(){
+    long getEpochId() {
         return epochId_;
     }
 
-    LogRecordId getLogRecordId(){
+    LogRecordId getLogRecordId() {
         return logRecordId_;
     }
 
-    LogRecordType getType(){
+    LogRecordType getType() {
         return logRecordType_;
     }
 }

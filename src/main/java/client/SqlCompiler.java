@@ -5,19 +5,19 @@ public class SqlCompiler {
     String queryId_;
 
 
-    public SqlCompiler(String sql) throws Exception{
+    public SqlCompiler(String sql) throws Exception {
 
     }
 
-    public String getQueryId(){
+    public String getQueryId() {
         return queryId_;
     }
 
-    public boolean compileEmpCode() throws Exception{
+    public boolean compileEmpCode() throws Exception {
         return true;
     }
 
-    public String getEmpCode() throws Exception{
+    public String getEmpCode() throws Exception {
         //get compiled emp code for SQL query
         return null;
     }

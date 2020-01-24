@@ -30,9 +30,7 @@ public class TransactionId implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         TransactionId other = (TransactionId) obj;
-        if (myid != other.myid)
-            return false;
-        return true;
+        return myid == other.myid;
     }
 
     @Override

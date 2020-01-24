@@ -9,12 +9,13 @@ public class TranxManager {
     EpochManager epochManager_;
     BatchManager batchManager_;
     TpccGen generator_;
-    public void recordTranxStats(Transaction t){
+
+    public void recordTranxStats(Transaction t) {
         //TODO collect stats of tranx's read write operations
     }
 
 
-    public boolean validateTranx(Transaction t){
+    public boolean validateTranx(Transaction t) {
         //TODO use write read set for validation
         return true;
     }

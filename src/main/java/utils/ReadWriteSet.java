@@ -2,7 +2,7 @@ package utils;
 
 import java.util.HashMap;
 
-enum RWType{
+enum RWType {
     INVALID,
     READ,
     READ_OWN,  // select for update

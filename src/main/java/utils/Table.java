@@ -11,18 +11,19 @@ public class Table implements Runnable {
     //TODO add tuple schema
 
 
-    public int getTableSize(){
+    public int getTableSize() {
         return size_;
     }
 
-    public void addTuples(Table src){
+    public void addTuples(Table src) {
         if (src == null) return;
 
         for (Tuple t : src.tuples_) {
             tuples_.add(t);
         }
     }
-    public void run(){
+
+    public void run() {
 
     }
 
@@ -30,11 +31,15 @@ public class Table implements Runnable {
         return tuples_;
     }
 
-    public int tupleSize(){ return size_; }
+    public int tupleSize() {
+        return size_;
+    }
 
-    public int tupleCount(){ return count_; }
+    public int tupleCount() {
+        return count_;
+    }
 
-    public Tuple getTuple(int offset){
+    public Tuple getTuple(int offset) {
         return tuples_.get(offset);
     }
 }

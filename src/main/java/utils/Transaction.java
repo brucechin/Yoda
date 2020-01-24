@@ -14,13 +14,13 @@ enum ResultType {
     UNKNOWN,
     QUEUING,
     TO_ABORT
-};
+}
 
 enum TransactionPhase {
     READ,
     COMPUTE,
     WRITE
-};
+}
 
 public class Transaction {
     private final TransactionId txnId_;
@@ -50,15 +50,14 @@ public class Transaction {
     }
 
 
-    public boolean commit() throws IOException{
+    public boolean commit() throws IOException {
         //TODO persist updates here
         return true;
     }
 
-    public boolean abort() throws IOException{
+    public boolean abort() throws IOException {
         return true;
     }
-
 
 
 }

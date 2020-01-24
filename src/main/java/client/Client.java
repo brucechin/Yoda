@@ -1,8 +1,7 @@
 package client;
-import utils.Transaction;
-import client.SqlCompiler;
 
-import java.util.List;
+import utils.Transaction;
+
 import java.util.Queue;
 
 public class Client {
@@ -13,26 +12,26 @@ public class Client {
     private String IP_;
     private int port_;
 
-    public Client(){
+    public Client() {
         //constructor
     }
 
-    boolean connect(){
+    boolean connect() {
         //connect to cloud server
         return true;
     }
 
-    boolean submitTranx(Transaction t){
+    boolean submitTranx(Transaction t) {
         //TODO synchronous or asynchronous?
         return true;
     }
 
-    Transaction compileTranx(Transaction t){
+    Transaction compileTranx(Transaction t) {
         //compile all queries in tranx to EMP code
         return t;
     }
 
-    void generateTranx(){
+    void generateTranx() {
         Transaction t = new Transaction();
         Transaction compiled = compileTranx(t);
         tranxQueue_.add(compiled);

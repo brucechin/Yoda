@@ -2,7 +2,6 @@ package storage;
 
 import utils.Table;
 
-import javax.print.DocFlavor;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,11 +14,11 @@ public class SecretShareStorage {
 
     //TODO add JDBC connection variables for extracting secret shares from data owners.
 
-    SecretShareStorage(){
+    SecretShareStorage() {
 
     }
 
-    public void addDataOwner(String dataOwner){
+    public void addDataOwner(String dataOwner) {
 
     }
 

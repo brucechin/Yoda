@@ -10,7 +10,7 @@ public class QueryTask implements Runnable {
     //TODO add query type, start/end time,
 
     @Override
-    public void run(){
+    public void run() {
 
     }
 }

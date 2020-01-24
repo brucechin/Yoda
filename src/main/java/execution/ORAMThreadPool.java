@@ -3,7 +3,7 @@ package execution;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class ORAMThreadPool <Job extends Runnable> {
+public class ORAMThreadPool<Job extends Runnable> {
     //use this pool to execute QueryTasks in the queue
     private int numORAM_;
     private ThreadPoolExecutor threadPool_;

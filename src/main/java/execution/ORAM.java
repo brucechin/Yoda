@@ -11,11 +11,11 @@ public class ORAM {
     List<Tuple> stash_;
     SecretShareStorage secretShareStorage_;
 
-    public ORAM(){
+    public ORAM() {
 
     }
 
-    public void read(){
+    public void read() {
 
     }
 
