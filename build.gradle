@@ -13,4 +13,17 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.apache.calcite', name: 'calcite-core', version: '1.20.0'
+    // https://mvnrepository.com/artifact/net.sf.jsqlparser/jsqlparser
+    compile group: 'net.sf.jsqlparser', name: 'jsqlparser', version: '0.8.0'
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.0.0'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.4'
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+    // https://mvnrepository.com/artifact/org.gridkit.lab/nanocloud
+    compile group: 'org.gridkit.lab', name: 'nanocloud', version: '0.8.11'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12
+    testCompile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.21'
 }

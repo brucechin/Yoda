@@ -1,0 +1,10 @@
+package $packageName;
+
+//simple lcc code for select * from items;
+
+$structName $tupleName;
+
+//replace $ with number of tuple bits
+int$size[n] output;
+
+

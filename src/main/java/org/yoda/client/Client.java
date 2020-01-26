@@ -1,6 +1,6 @@
 package org.yoda.client;
 
-import org.yoda.utils.Transaction;
+import org.yoda.util.Transaction;
 
 import java.util.Queue;
 
