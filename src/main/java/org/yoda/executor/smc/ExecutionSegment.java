@@ -3,6 +3,7 @@ package org.yoda.executor.smc;
 import com.oblivm.backend.flexsc.Party;
 import org.yoda.db.data.Tuple;
 import org.yoda.executor.config.RunConfig;
+import org.yoda.type.SecureRelRecordType;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,13 +17,16 @@ public class ExecutionSegment implements Serializable {
     public RunConfig runConf;
     public String workerId;
     public Party party;
-
+    public SecureRelRecordType outSchema;
+    public SecureRelRecordType inSchema;
     //public ExecutionMode executionMode;
-    //public boolean isPlanRoot = false;
 
     //public List<Tuple> sliceValues;
     public List<Tuple> complementValues;
 
+    public ExecutionSegment(QueryExecution qe) {
+        rootNode = qe;
+    }
 
     public void checkInit() throws Exception {
         if (party == null || workerId == null) {
@@ -42,7 +46,7 @@ public class ExecutionSegment implements Serializable {
 
 
         if (op.getWorkerId() == null || op.getParty() == null) {
-			throw new Exception("Bad configuration for " + op);
+            throw new Exception("Bad configuration for " + op);
         }
 
 

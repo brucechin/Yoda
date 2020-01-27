@@ -31,7 +31,7 @@ public class BasicSecureQueryTable implements SecureQueryTable, Serializable {
     transient SMCRunnable parent = null;
     QueryTable plaintextOutput;
     int tupleSize;
-    SecureMerge merger;
+    SecureMerge merger; //use SecureMerge to restore the plaintext table from secret shares in two parties
 
     // PI is null if this is part of a SlicedSecureQueryTable
     BasicSecureQueryTable plaintextInput;
@@ -44,6 +44,7 @@ public class BasicSecureQueryTable implements SecureQueryTable, Serializable {
         party = env.party;
         parent = r;
         tupleSize = (table == null) ? 0 : table.size();
+        //TODO how to restore in query execution abstraction?(we do not have operator execution class now)
         OperatorExecution op = parent.getRootOperator();
         merger = SecureMergeFactory.get(op);
         R = GCGenComp.R;
@@ -109,13 +110,6 @@ public class BasicSecureQueryTable implements SecureQueryTable, Serializable {
         return merger.merge(this, localEnv, runnable);
     }
 
-
-    @Override
-    public void setPlaintextOutput(QueryTable pc) throws Exception {
-        plaintextOutput = pc;
-
-    }
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeObject(payload);
         out.writeObject(nonNullLength);
@@ -145,7 +139,6 @@ public class BasicSecureQueryTable implements SecureQueryTable, Serializable {
         //parent = (SMCRunnable)ois.readObject();
     }
 
-
     @Override
     public GCSignal[] getSecurePayload(CompEnv<GCSignal> localEnv) {
         return payload;
@@ -156,10 +149,15 @@ public class BasicSecureQueryTable implements SecureQueryTable, Serializable {
         return nonNullLength;
     }
 
-
     @Override
     public QueryTable getPlaintextOutput() {
         return plaintextOutput;
+    }
+
+    @Override
+    public void setPlaintextOutput(QueryTable pc) throws Exception {
+        plaintextOutput = pc;
+
     }
 
     @Override

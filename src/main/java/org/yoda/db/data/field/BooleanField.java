@@ -1,8 +1,8 @@
 package org.yoda.db.data.field;
 
-import java.io.Serializable;
-
 import org.yoda.type.SecureRelDataTypeField;
+
+import java.io.Serializable;
 
 public class BooleanField extends Field implements Serializable {
     public boolean value;

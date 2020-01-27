@@ -1,27 +1,20 @@
 package org.yoda.executor.config;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.yoda.config.SystemConfiguration;
 import org.yoda.util.Utilities;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
+
 // read config and connect to psql instances
 public class ConnectionManager {
 
+    private static ConnectionManager instance = null;
     private Map<String, WorkerConfiguration> workers;
     private Map<Integer, WorkerConfiguration> workersById;
     private List<String> hosts;
-
-    private static ConnectionManager instance = null;
 
 
     protected ConnectionManager() throws Exception {

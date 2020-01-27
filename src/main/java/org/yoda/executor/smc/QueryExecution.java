@@ -3,6 +3,9 @@ package org.yoda.executor.smc;
 import com.oblivm.backend.flexsc.Party;
 import com.oblivm.backend.gc.GCSignal;
 import com.oblivm.backend.oram.SecureArray;
+import org.yoda.codegen.CodeGenerator;
+import org.yoda.codegen.smc.query.SecureQuery;
+import org.yoda.executor.config.RunConfig;
 import org.yoda.executor.step.SecureStep;
 import org.yoda.type.SecureRelRecordType;
 import org.yoda.util.Utilities;
@@ -11,23 +14,25 @@ import org.yoda.util.Utilities;
 //there is no plaintext or sliced secure execution
 public class QueryExecution {
     private static final long serialVersionUID = 6565213527478140219L;
-    public String packageName; //TODO replace this with query type
+    public String packageName;
+    //TODO need to read how QueryCompiler get the schema
+    public SecureRelRecordType inSchema;
     public SecureRelRecordType outSchema;
     public byte[] byteCode; // compiled .class for this step
     public ExecutionSegment parentSegment = null; // pointer to segment for SMCConfig
-    // for merge case
-    String sourceSQL = null;
     public transient SecureArray<GCSignal> output; // optional - for passing around data w/in segment
+    private SecureQuery query; // point to specific query class like TpccGetWarehouseTax and call its generate() API to generate lcc code
+    RunConfig runConf;
+    // for merge case
 
 
     public QueryExecution() {
 
     }
 
-
-    public QueryExecution(SecureStep s) {
-        packageName = s.getPackageName();
-        outSchema = s.getSchema(); //change this
+    public QueryExecution(SecureQuery q) {
+        packageName = q.getPackageName();
+        outSchema = q.getSchema(); //change this
 
         try {
             byteCode = Utilities.readGeneratedClassFile(packageName);//TODO how to read query's byte code??
@@ -37,6 +42,25 @@ public class QueryExecution {
 
     }
 
+    public String generate() throws Exception {
+        return query.generate();
+    }
+
+    public String getQueryName() {
+        return query.getQueryName();
+    }
+
+    public RunConfig getRunConfig() {
+        return runConf;
+    }
+
+//    public SecureRelRecordType getInSchema() {
+//        return codeGenerator.getInSchema();
+//    }
+//
+//    public SecureRelRecordType getSchema() {
+//        return codeGenerator.getSchema();
+//    }
 
     public Party getParty() {
         if (parentSegment != null)
@@ -54,19 +78,9 @@ public class QueryExecution {
     public String toString() {
 
         String ret = packageName + getParty() + ", " + getWorkerId();
-        if (getSourceSQL() != null)
-            ret += "source: " + getSourceSQL();
+        ret += "  source: " + query.getQueryStmt();
 
         return ret;
     }
 
-
-    public String getSourceSQL() {
-        return sourceSQL;
-    }
-
-
-    public void setSourceSQL(String sourceSql) throws Exception {
-        this.sourceSQL = sourceSql;
-    }
 }

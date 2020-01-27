@@ -27,13 +27,13 @@ public class Transaction {
     private final TransactionId txnId_;
     boolean is_written_; // if tranx has write op
     boolean read_only_ = false;
-    private TransactionPhase phase_;
     int threadId_; // which thread is executing this tranx
     long epochId_;
     long timestamp_; // when the transaction began
     ReadWriteSet rwSet_;//TODO  split read and write set?
     ResultType result_ = ResultType.SUCCESS;
     List<String> queryStrings_; //list of queries. Need to compiled to EMP code before submitting to server for org.yoda.execution
+    private TransactionPhase phase_;
 
 
     //TODO where to store the intermediate query results, in this Transaction?

@@ -30,38 +30,14 @@ import java.util.logging.Logger;
 //act like a thread pool in architecture design doc
 public class YodaQueryExecutor {
     private static YodaQueryExecutor instance = null; //singleton design
-    private SecureRelRecordType lastSchema;
-    private List<SecureQueryTable> lastOutput;
     Cloud cloud = null;
     WorkerConfiguration aliceWorker, bobWorker;
     String remotePath;
     Logger logger;
+    private SecureRelRecordType lastSchema;
+    private List<SecureQueryTable> lastOutput;
     //TODO add multiple ORAM workers for parallel execution
     //TODO add query queue
-
-    public static YodaQueryExecutor getInstance() throws Exception {
-        if (instance == null) {
-            ConnectionManager cm = null;
-            try {
-                cm = ConnectionManager.getInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            assert cm != null;
-            List<WorkerConfiguration> workers = cm.getWorkerConfigurations();
-
-            if (workers.size() >= 2) {
-                String aWorkerId = workers.get(0).workerId;
-                String bWorkerId = workers.get(1).workerId;
-                try {
-                    instance = new YodaQueryExecutor(aWorkerId, bWorkerId);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return instance;
-    }
 
     public YodaQueryExecutor(String aWorker, String bWorker) throws Exception {
         //TODO initialize worker configurations, logger, remote path, cloud, bufferpool
@@ -112,6 +88,40 @@ public class YodaQueryExecutor {
         });
     }
 
+    public static YodaQueryExecutor getInstance() throws Exception {
+        if (instance == null) {
+            ConnectionManager cm = null;
+            try {
+                cm = ConnectionManager.getInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            assert cm != null;
+            List<WorkerConfiguration> workers = cm.getWorkerConfigurations();
+
+            if (workers.size() >= 2) {
+                String aWorkerId = workers.get(0).workerId;
+                String bWorkerId = workers.get(1).workerId;
+                try {
+                    instance = new YodaQueryExecutor(aWorkerId, bWorkerId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public static String getRemotePathToJar(final String partOfJarName) throws Exception {
+        for (Classpath.ClasspathEntry cpe : Classpath.getClasspath(ClassLoader.getSystemClassLoader())) {
+
+            if (cpe.getFileName().contains(partOfJarName)) {
+                return File.separatorChar + cpe.getContentHash() + File.separatorChar + cpe.getFileName();
+            }
+        }
+        throw new Exception("Jar not found!");
+    }
+
     public Cloud getCloud() {
         return cloud;
     }
@@ -153,16 +163,6 @@ public class YodaQueryExecutor {
         List<String> params = Utilities.readFile(srcFile);
         return StringUtils.join(params.toArray(), '\n');
 
-    }
-
-    public static String getRemotePathToJar(final String partOfJarName) throws Exception {
-        for (Classpath.ClasspathEntry cpe : Classpath.getClasspath(ClassLoader.getSystemClassLoader())) {
-
-            if (cpe.getFileName().contains(partOfJarName)) {
-                return File.separatorChar + cpe.getContentHash() + File.separatorChar + cpe.getFileName();
-            }
-        }
-        throw new Exception("Jar not found!");
     }
 
     public List<SecureQueryTable> runSecure(ExecutionSegment segment) {

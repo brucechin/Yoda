@@ -3,7 +3,6 @@ package org.yoda.db.schema;
 import org.yoda.config.SystemConfiguration;
 import org.yoda.executor.config.WorkerConfiguration;
 import org.yoda.type.SecureRelDataTypeField.SecurityPolicy;
-import org.yoda.util.Utilities;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -17,9 +16,8 @@ import java.util.Map;
 public class SecureSchemaLookup {
 
 
-    Map<String, Map<String, SecurityPolicy>> accessPolicies;
-
     static SecureSchemaLookup instance;
+    Map<String, Map<String, SecurityPolicy>> accessPolicies;
 
     protected SecureSchemaLookup(WorkerConfiguration config) throws ClassNotFoundException, SQLException {
         accessPolicies = new HashMap<String, Map<String, SecurityPolicy>>();

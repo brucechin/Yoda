@@ -1,26 +1,28 @@
 package org.yoda.codegen;
 
+import org.yoda.type.SecureRelRecordType;
+
 public interface CodeGenerator {
 
-	String generate() throws Exception;
+    String generate() throws Exception;
 
 
-	//String generate(boolean asSecureLeaf) throws Exception;
+    //String generate(boolean asSecureLeaf) throws Exception;
 
-	public String getPackageName();
-
-
-	//public SecureRelRecordType getInSchema();
+    public String getPackageName();
 
 
-	public String destFilename();
-
-	public void compileIt() throws Exception;
-
-	//public SecureRelRecordType getSchema();
+    //public SecureRelRecordType getInSchema();//input schema
 
 
-	//public SecureRelRecordType getSchema(boolean asSecureLeaf);
+    public String destFilename();
+
+    public void compileIt() throws Exception;
+
+    //public SecureRelRecordType getSchema();//output schema
+
+
+    //public SecureRelRecordType getSchema(boolean asSecureLeaf);
 
 
 }

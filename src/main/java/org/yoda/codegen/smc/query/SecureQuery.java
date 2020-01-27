@@ -3,6 +3,7 @@ package org.yoda.codegen.smc.query;
 import org.yoda.codegen.CodeGenerator;
 import org.yoda.codegen.smc.DynamicCompiler;
 import org.yoda.db.query.Query;
+import org.yoda.type.SecureRelRecordType;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -11,12 +12,13 @@ import java.util.Map;
 public class SecureQuery implements CodeGenerator, Serializable {
     //in SMCQL there are many secure operator classes which can generate specific .lcc code using procedure templates
     protected Query planNode;
-
+    Map<String, String> variables; //used for lcc code generation. insert variables into procedure templates.
     public SecureQuery() {
     }
 
     public SecureQuery(Query q) throws Exception {
-
+        //todo use input to initialize variables. variables should be randomly generated.
+        planNode = q;
     }
 
     @Override
@@ -33,10 +35,25 @@ public class SecureQuery implements CodeGenerator, Serializable {
         return planNode.getQueryName();
     }
 
+    public String getQueryStmt() {
+        return planNode.getQueryStmt();
+    }
+
     @Override
     public String destFilename() {
         return planNode.destFilename();
     }
+
+    public SecureRelRecordType getSchema() {//output schema
+        //TODO
+        return null;
+    }
+
+    public SecureRelRecordType getInSchema() {//input schema
+        //TODO
+        return null;
+    }
+
 
     @Override
     public void compileIt() throws Exception {
@@ -61,9 +78,11 @@ public class SecureQuery implements CodeGenerator, Serializable {
 
         String dstSize = (projects.isEmpty()) ? variables.get("size") : Integer.toString(projects.get(0).getSchema().size());
 
+        //input and output schema size. maybe used in some lcc code.
         variables.put("sSize", srcSize);
         variables.put("dSize", dstSize);
 
+        //TODO add filter and project variables
         handleFilters(variables);
         handleProjects(variables);
 

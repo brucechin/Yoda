@@ -45,7 +45,6 @@ public class SMCQLRunnableImpl<T> implements Serializable {
         }
 
 
-
         parent = runnable;
     }
 
@@ -73,7 +72,7 @@ public class SMCQLRunnableImpl<T> implements Serializable {
     @SuppressWarnings("unchecked")
     SecureArray<T> runOne(QueryExecution op, CompEnv<T> env) throws Exception {
 
-        if (op == null || (op.parentSegment != runSpec)) // != runspec implies that child was computed in another segment
+        if (op == null) // != runspec implies that child was computed in another segment
             return null;
 
         // already exec'd cte
@@ -82,22 +81,26 @@ public class SMCQLRunnableImpl<T> implements Serializable {
         }
 
         //TODO we should delete below lines which execute op's children
-        SecureArray<T> lhs = runOne(op.lhsChild, env);
-        if (lhs == null) { // get input from outside execution segment
-            long start = System.nanoTime();
-            lhs = dataManager.getInput(op, true, env, parent);
-            long end = System.nanoTime();
-            logger.info("Loaded lhs data in " + (end - start) / 1e9 + " seconds.");
-        }
-        SecureArray<T> rhs = runOne(op.rhsChild, env);
+//        SecureArray<T> lhs = runOne(op.lhsChild, env);
+//        if (lhs == null) { // get input from outside execution segment
+//            long start = System.nanoTime();
+//            lhs = dataManager.getInput(op, true, env, parent);
+//            long end = System.nanoTime();
+//            logger.info("Loaded lhs data in " + (end - start) / 1e9 + " seconds.");
+//        }
+//        SecureArray<T> rhs = runOne(op.rhsChild, env);
+//
+//        if (rhs == null) {
+//            long start = System.nanoTime();
+//            rhs = dataManager.getInput(op, false, env, parent);
+//            long end = System.nanoTime();
+//            logger.info("Loaded rhs data in " + (end - start) / 1e9 + " seconds.");
+//
+//        }
 
-        if (rhs == null) {
-            long start = System.nanoTime();
-            rhs = dataManager.getInput(op, false, env, parent);
-            long end = System.nanoTime();
-            logger.info("Loaded rhs data in " + (end - start) / 1e9 + " seconds.");
-
-        }
+        //TODO how to use ISecureRunnable to execute queryExecution.
+        // SMCQL is designed for analytical workload where query plan tree is complex and operators usually have two inputs(like JOIN)
+        // but in transactional workloads, for exmaple in TPC-C, there are almost no such complext queries. Only PROJECT/WHERE exist.
 
         double start = System.nanoTime();
         ISecureRunnable<T> runnable = DynamicCompiler.loadClass(op.packageName, op.byteCode, env);
@@ -107,8 +110,8 @@ public class SMCQLRunnableImpl<T> implements Serializable {
         logger.info(msg);
 
         SecureArray<T> secResult = null;
-
-        secResult = runnable.run(lhs, rhs);
+        //TODO we need to modify run() interface in the lcc code to make it work for SecureQuery instances. It was designed for SecureOperation.
+        secResult = runnable.run(lhs, rhs); // lhs and rhs will be the input of run() function in lcc code
         if (secResult == null)
             throw new Exception("Null result for " + op.packageName);
 

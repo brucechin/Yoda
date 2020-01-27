@@ -22,35 +22,67 @@ import java.util.logging.Logger;
 // concatenating their results
 public class SqlQueryExecutor {
 
-	ConnectionManager connections = null;
+    ConnectionManager connections = null;
 
-	// say we want to collect statistics on diagnoses.patient_id
-	// this will return a list of Tuples (pid, site, count)
-	public SqlQueryExecutor() throws Exception {
-		connections = ConnectionManager.getInstance();
-	}
-
-
-	public static QueryTable query(SecureRelRecordType outSchema, String query, Connection c) throws Exception {
-		List<Tuple> queryOutput = new ArrayList<Tuple>();
-
-		Statement st = c.createStatement();
-		ResultSet rs = st.executeQuery(query);
-		if (!rs.isBeforeFirst()) // empty input set
-			return new QueryTable(outSchema);
-
-		while (rs.next()) {
-			Tuple t = new Tuple(outSchema, rs);
-			queryOutput.add(t);
-		}
+    // say we want to collect statistics on diagnoses.patient_id
+    // this will return a list of Tuples (pid, site, count)
+    public SqlQueryExecutor() throws Exception {
+        connections = ConnectionManager.getInstance();
+    }
 
 
-		return new QueryTable(queryOutput);
-	}
+    public static QueryTable query(SecureRelRecordType outSchema, String query, Connection c) throws Exception {
+        List<Tuple> queryOutput = new ArrayList<Tuple>();
 
-	// no joins between engines
-	// just run each query once per data source and concatenate their collective outputs
-	public QueryTable plainQuery(SecureRelRecordType outSchema, String query) throws Exception {
+        Statement st = c.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        if (!rs.isBeforeFirst()) // empty input set
+            return new QueryTable(outSchema);
+
+        while (rs.next()) {
+            Tuple t = new Tuple(outSchema, rs);
+            queryOutput.add(t);
+        }
+
+
+        return new QueryTable(queryOutput);
+    }
+
+    public static QueryTable query(String sql, String workerId) throws Exception {
+        SecureRelRecordType outSchema = Utilities.getOutSchemaFromString(sql);
+
+        YodaQueryExecutor executor = YodaQueryExecutor.getInstance();
+        return executor.runPlaintext(workerId, sql, outSchema);
+
+
+    }
+
+    public static QueryTable query(String sql, SecureRelRecordType outSchema, String workerId) throws Exception {
+        Logger logger = SystemConfiguration.getInstance().getLogger();
+        double start = System.nanoTime();
+        logger.info("Starting query");
+        Connection c = ConnectionManager.getInstance().getConnection(workerId);
+        QueryTable result = query(outSchema, sql, c);
+        double end = System.nanoTime();
+        double elapsed = (end - start) / 1e9;
+        logger.info("Finished running in " + elapsed + " seconds.");
+
+        return result;
+
+    }
+
+    // for CREATE TABLE, etc.
+    public static void queryNoOutput(String sql, String workerId) throws SQLException, Exception {
+        Connection c = ConnectionManager.getInstance().getConnection(workerId);
+
+        Statement st = c.createStatement();
+        st.execute(sql);
+
+    }
+
+    // no joins between engines
+    // just run each query once per data source and concatenate their collective outputs
+    public QueryTable plainQuery(SecureRelRecordType outSchema, String query) throws Exception {
 
         YodaQueryExecutor executor = YodaQueryExecutor.getInstance();
         List<QueryTable> output = executor.runPlaintext(query, outSchema);
@@ -63,44 +95,11 @@ public class SqlQueryExecutor {
 
         while (itr.hasNext()) {
             QueryTable t = itr.next();
-			ret.addTuples(t);
-		}
+            ret.addTuples(t);
+        }
 
-		return ret;
-	}
-
-	public static QueryTable query(String sql, String workerId) throws Exception {
-        SecureRelRecordType outSchema = Utilities.getOutSchemaFromString(sql);
-
-        YodaQueryExecutor executor = YodaQueryExecutor.getInstance();
-        return executor.runPlaintext(workerId, sql, outSchema);
-
-
+        return ret;
     }
-
-
-	public static QueryTable query(String sql, SecureRelRecordType outSchema, String workerId) throws Exception {
-		Logger logger = SystemConfiguration.getInstance().getLogger();
-		double start = System.nanoTime();
-		logger.info("Starting query");
-		Connection c = ConnectionManager.getInstance().getConnection(workerId);
-		QueryTable result = query(outSchema, sql, c);
-		double end = System.nanoTime();
-		double elapsed = (end - start) / 1e9;
-		logger.info("Finished running in " + elapsed + " seconds.");
-
-		return result;
-
-	}
-
-	// for CREATE TABLE, etc.
-	public static void queryNoOutput(String sql, String workerId) throws SQLException, Exception {
-		Connection c = ConnectionManager.getInstance().getConnection(workerId);
-
-		Statement st = c.createStatement();
-		st.execute(sql);
-
-	}
 
 }
 

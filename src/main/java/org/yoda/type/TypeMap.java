@@ -1,13 +1,11 @@
 package org.yoda.type;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.sql.type.SqlTypeName;
 
-import net.sf.jsqlparser.statement.create.table.ColDataType;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // singleton for converting from sql types to smc types and vice versa
 // file format: sql name, smc name, sizeof(entry)

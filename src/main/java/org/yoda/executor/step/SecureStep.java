@@ -8,7 +8,7 @@ import org.yoda.type.SecureRelRecordType;
 import java.io.Serializable;
 
 public class SecureStep implements ExecutionStep, Serializable {
-
+    //TODO we need to remove all SecureStep used in the project. it's for query tree recursive execution. we only have one step for each query execution.
     transient CodeGenerator codeGenerator;
     RunConfig runConf;
     boolean visited = false;

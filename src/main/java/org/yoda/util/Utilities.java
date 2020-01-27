@@ -191,8 +191,6 @@ public class Utilities {
     }
 
 
-
-
     public static SecureRelDataTypeField lookUpAttribute(String table, String attr) throws Exception {
         SystemConfiguration conf = SystemConfiguration.getInstance();
         SchemaPlus tables = conf.getPdnSchema();

@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Queue;
 
 public class BatchManager {
+    TranxQueue queue_;
     private List<Transaction> runningTranx;
     private Queue<String> operationQueue; //I/O operations waiting for submitting to ORAM servers for org.yoda.execution
     private int batchSize;
-    TranxQueue queue_;
 
 
     BatchManager() {

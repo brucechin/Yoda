@@ -1,12 +1,12 @@
 package org.yoda.db.data.field;
 
-import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
-
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.yoda.type.SecureRelDataTypeField;
+
+import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
 
 public class FieldFactory implements Serializable {
 

@@ -1,27 +1,19 @@
 package org.yoda.type;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.calcite.rel.logical.LogicalFilter;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rel.type.RelDataTypeField;
 import org.apache.calcite.rel.type.RelDataTypeFieldImpl;
 import org.apache.calcite.rel.type.RelDataTypeSystem;
-import org.apache.calcite.sql.SqlCollation;
 import org.apache.calcite.sql.type.BasicSqlType;
 import org.apache.calcite.sql.type.SqlTypeName;
-import org.apache.calcite.util.SerializableCharset;
-import org.apache.commons.lang.CharSet;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.yoda.util.Utilities;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 // thin wrapper on top of RelDataTypeField for attaching security policy to an attribute
 // how do we call this at schema construction time?
@@ -33,21 +25,15 @@ public class SecureRelDataTypeField extends RelDataTypeFieldImpl implements Seri
      *
      */
     private static final long serialVersionUID = 1L;
-
-    public enum SecurityPolicy {
-        Public, Protected, Private
-    }
+    SecurityPolicy policy = SecurityPolicy.Private;
 
     ;
-
-    SecurityPolicy policy = SecurityPolicy.Private;
     RelDataTypeField baseField;
-
+    transient List<LogicalFilter> filters;
     // both of below are null if field sourced from greater than one attribute
     // stored in original tables
     private String storedTable;
     private String storedAttribute;
-    transient List<LogicalFilter> filters;
 
     public SecureRelDataTypeField(String name, int index, RelDataType type) {
         super(name, index, type);
@@ -172,6 +158,10 @@ public class SecureRelDataTypeField extends RelDataTypeFieldImpl implements Seri
         if (storedAttribute != null && storedTable != null && policy == SecurityPolicy.Public)
             return true;
         return false;
+    }
+
+    public enum SecurityPolicy {
+        Public, Protected, Private
     }
 
 }

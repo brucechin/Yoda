@@ -41,38 +41,6 @@ public class DynamicCompiler {
      */
     private static String classOutputFolder = Utilities.getCodeGenTarget();
 
-    public static class MyDiagnosticListener implements DiagnosticListener<JavaFileObject> {
-        public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-
-            System.out.println("Line Number->" + diagnostic.getLineNumber());
-            System.out.println("code->" + diagnostic.getCode());
-            System.out.println("Message->"
-                    + diagnostic.getMessage(Locale.ENGLISH));
-            System.out.println("Source->" + diagnostic.getSource());
-            System.out.println(" ");
-        }
-    }
-
-    /**
-     * java File Object represents an in-memory java source file <br>
-     * so there is no need to put the source file on hard disk
-     **/
-    public static class InMemoryJavaFileObject extends SimpleJavaFileObject {
-        private String contents = null;
-
-        public InMemoryJavaFileObject(String className, String contents) throws Exception {
-            super(URI.create("string:///" + className.replace('.', '/')
-                    + Kind.SOURCE.extension), Kind.SOURCE);
-            this.contents = contents;
-        }
-
-        public CharSequence getCharContent(boolean ignoreEncodingErrors)
-                throws IOException {
-            return contents;
-        }
-    }
-
-
     @SuppressWarnings("unchecked")
     public static <T> ISecureRunnable<T> loadClass(String packageName, CompEnv<T> env, String jarFile) throws Exception {
         System.out.println("Loading from " + jarFile + " looking for " + packageName);
@@ -93,7 +61,6 @@ public class DynamicCompiler {
 
     }
 
-
     @SuppressWarnings("unchecked")
     public static <T> ISecureRunnable<T> loadClass(String packageName, CompEnv<T> env) throws Exception {
         String className = packageName + ".NoClass";
@@ -109,7 +76,6 @@ public class DynamicCompiler {
 
 
     }
-
 
     @SuppressWarnings("unchecked")
     public static <T> ISecureRunnable<T> loadClass(String packageName, byte[] byteCode, CompEnv<T> env) throws Exception {
@@ -168,7 +134,6 @@ public class DynamicCompiler {
         Iterable<? extends JavaFileObject> files = Arrays.asList(sos);
         DynamicCompiler.compile(files);
     }
-
 
     public static void compileOblivFromFile(String srcFile) throws Exception {
         String dstPath = Utilities.getCodeGenTarget();
@@ -229,10 +194,8 @@ public class DynamicCompiler {
 
     }
 
-
     public static void runGenerator(String className, String host, int port, SecureArray<GCSignal> input) {
     }
-
 
     /**
      * run class from the compiled byte code file by URLClassloader
@@ -266,6 +229,37 @@ public class DynamicCompiler {
         } catch (ClassNotFoundException e) {
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public static class MyDiagnosticListener implements DiagnosticListener<JavaFileObject> {
+        public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
+
+            System.out.println("Line Number->" + diagnostic.getLineNumber());
+            System.out.println("code->" + diagnostic.getCode());
+            System.out.println("Message->"
+                    + diagnostic.getMessage(Locale.ENGLISH));
+            System.out.println("Source->" + diagnostic.getSource());
+            System.out.println(" ");
+        }
+    }
+
+    /**
+     * java File Object represents an in-memory java source file <br>
+     * so there is no need to put the source file on hard disk
+     **/
+    public static class InMemoryJavaFileObject extends SimpleJavaFileObject {
+        private String contents = null;
+
+        public InMemoryJavaFileObject(String className, String contents) throws Exception {
+            super(URI.create("string:///" + className.replace('.', '/')
+                    + Kind.SOURCE.extension), Kind.SOURCE);
+            this.contents = contents;
+        }
+
+        public CharSequence getCharContent(boolean ignoreEncodingErrors)
+                throws IOException {
+            return contents;
         }
     }
 

@@ -30,26 +30,6 @@ public class SecureOutputReader {
         return decodeSignals(alice.payload, bob.payload, length * schema.size(), R, schema);
     }
 
-    public static QueryTable assembleOutput(SlicedSecureQueryTable alice, SlicedSecureQueryTable bob, SecureRelRecordType schema) throws Exception {
-        GCSignal R = alice.R;
-
-        if (schema == null)
-            schema = alice.schema;
-
-        assert (R != null);
-
-        QueryTable result = new QueryTable(schema);
-        for (Tuple t : alice.slices.keySet()) {
-            BasicSecureQueryTable a = alice.slices.get(t);
-            BasicSecureQueryTable b = bob.slices.get(t);
-            int length = decodeInt(a.nonNullLength, b.nonNullLength, R);
-            QueryTable sliceResult = decodeSignals(a.payload, b.payload, length * schema.size(), R, schema);
-            result.addTuples(sliceResult);
-        }
-
-        return result;
-    }
-
 
     private static GCSignal[] readSignals(String filename) throws Exception {
         byte[] data = readFile(filename);

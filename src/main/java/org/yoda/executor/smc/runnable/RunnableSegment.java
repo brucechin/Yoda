@@ -1,12 +1,12 @@
 package org.yoda.executor.smc.runnable;
 
-import java.io.Serializable;
-import java.util.concurrent.Callable;
-
+import com.oblivm.backend.flexsc.Party;
 import org.yoda.executor.smc.ExecutionSegment;
 import org.yoda.executor.smc.SecureBufferPool;
 import org.yoda.executor.smc.SecureQueryTable;
-import com.oblivm.backend.flexsc.Party;
+
+import java.io.Serializable;
+import java.util.concurrent.Callable;
 
 // creates runner thread for single SecureOperator
 // this one implements single input, single output (no joins)
@@ -16,16 +16,12 @@ public class RunnableSegment<T> implements Callable<SecureQueryTable>, Serializa
      *
      */
     private static final long serialVersionUID = 5996234969658841425L;
-
-    Thread runnerThread;
-    ExecutionSegment segment;
-
-
     protected SecureBufferPool bufferPool = null;
-
     // only one of these two may be non-null
     protected SMCQLRunnable.Generator<T> genRunner = null;
     protected SMCQLRunnable.Evaluator<T> evaRunner = null;
+    Thread runnerThread;
+    ExecutionSegment segment;
 
 
     public RunnableSegment(ExecutionSegment exec) throws Exception {

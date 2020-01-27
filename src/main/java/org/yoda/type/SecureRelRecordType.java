@@ -1,31 +1,21 @@
 package org.yoda.type;
 
+import org.apache.calcite.rel.type.RelDataTypeField;
+import org.apache.calcite.rel.type.RelDataTypeFieldImpl;
+import org.apache.calcite.rel.type.RelDataTypeSystem;
+import org.apache.calcite.rel.type.RelRecordType;
+import org.apache.calcite.sql.type.BasicSqlType;
+import org.apache.calcite.sql.type.SqlTypeName;
+import org.apache.commons.lang.StringUtils;
+import org.yoda.type.SecureRelDataTypeField.SecurityPolicy;
+import org.yoda.util.CodeGenUtils;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import org.apache.calcite.adapter.jdbc.JdbcTableScan;
-import org.apache.calcite.rel.logical.LogicalFilter;
-import org.apache.calcite.rel.type.RelDataTypeField;
-import org.apache.calcite.rel.type.RelDataTypeFieldImpl;
-import org.apache.calcite.rel.type.RelDataTypeSystem;
-import org.apache.calcite.rel.type.RelRecordType;
-import org.apache.calcite.rex.RexNode;
-import org.apache.calcite.sql.type.BasicSqlType;
-import org.apache.calcite.sql.type.SqlTypeName;
-import org.apache.commons.lang.StringUtils;
-import org.yoda.db.data.field.Field;
-import org.yoda.db.schema.SecureSchemaLookup;
-import org.yoda.plan.operator.Join;
-import org.yoda.plan.operator.Operator;
-import org.yoda.plan.operator.SeqScan;
-import org.yoda.type.SecureRelDataTypeField.SecurityPolicy;
-import org.yoda.util.CodeGenUtils;
-import org.yoda.util.Utilities;
 
 
 // decorator for RelRecordType, annotate with a security policy
@@ -48,6 +38,12 @@ public class SecureRelRecordType implements Serializable {
     public SecureRelRecordType(RelRecordType baseRow, List<SecureRelDataTypeField> fields) {
         baseType = baseRow;
         secureFields = new ArrayList<SecureRelDataTypeField>(fields);
+
+    }
+
+    public SecureRelRecordType(SecureRelRecordType schema) {
+        baseType = schema.baseType;
+        secureFields = new ArrayList<SecureRelDataTypeField>(schema.getSecureFieldList());
 
     }
 
@@ -105,13 +101,6 @@ public class SecureRelRecordType implements Serializable {
         } catch (Exception e) {
         }
         secureFields = secure;
-    }
-
-
-    public SecureRelRecordType(SecureRelRecordType schema) {
-        baseType = schema.baseType;
-        secureFields = new ArrayList<SecureRelDataTypeField>(schema.getSecureFieldList());
-
     }
 
     public SecureRelDataTypeField getSecureField(int idx) {

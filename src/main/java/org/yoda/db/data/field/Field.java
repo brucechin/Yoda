@@ -1,9 +1,9 @@
 package org.yoda.db.data.field;
 
+import org.yoda.type.SecureRelDataTypeField;
+
 import java.io.Serializable;
 import java.util.Comparator;
-
-import org.yoda.type.SecureRelDataTypeField;
 
 // individual attribute value inside a tuple
 // for use in slice values and for passing around data between SMC and plaintext

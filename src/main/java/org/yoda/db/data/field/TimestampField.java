@@ -1,9 +1,9 @@
 package org.yoda.db.data.field;
 
+import org.yoda.type.SecureRelDataTypeField;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
-
-import org.yoda.type.SecureRelDataTypeField;
 
 
 public class TimestampField extends Field implements Serializable {

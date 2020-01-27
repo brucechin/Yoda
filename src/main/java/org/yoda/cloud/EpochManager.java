@@ -5,9 +5,9 @@ import java.util.Queue;
 
 public class EpochManager {
     int curEpochId_;
-    private boolean isRunning_;
     ORAMThreadPool threadPool_; // use this thread pool to execute query tasks.
     Queue<String> epochQueue; //epoches of operations waiting for org.yoda.execution
+    private boolean isRunning_;
 
     //TODO we can have a read write logging for each epoch here for validation?
     public int getCurEpochId() {

@@ -1,10 +1,10 @@
 package org.yoda.db.data.field;
 
+import org.yoda.type.SecureRelDataTypeField;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
-
-import org.yoda.type.SecureRelDataTypeField;
 
 public class CharField extends Field implements Serializable {
     public String value;

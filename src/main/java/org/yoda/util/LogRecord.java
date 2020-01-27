@@ -18,16 +18,16 @@ public class LogRecord {
 
     }
 
-    void setEpochId(long eid) {
-        epochId_ = eid;
-    }
-
     void getLogRecordId(LogRecordId lid) {
         logRecordId_ = lid;
     }
 
     long getEpochId() {
         return epochId_;
+    }
+
+    void setEpochId(long eid) {
+        epochId_ = eid;
     }
 
     LogRecordId getLogRecordId() {

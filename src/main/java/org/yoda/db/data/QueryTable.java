@@ -1,28 +1,22 @@
 package org.yoda.db.data;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.yoda.plan.slice.SliceKeyDefinition;
 import org.yoda.type.SecureRelDataTypeField;
 import org.yoda.type.SecureRelRecordType;
 import org.yoda.util.Utilities;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+
 
 public class QueryTable implements Serializable {
 
-    private List<Tuple> tuples = null; // null until explicitly decrypted if init'd to PortableSecArray
-    transient private SecureRelRecordType schema;
-
     int tupleSize = 0;
     int tupleCount = 0;
+    private List<Tuple> tuples = null; // null until explicitly decrypted if init'd to PortableSecArray
+    transient private SecureRelRecordType schema;
 
 
     public QueryTable(List<Tuple> tuples) throws Exception {
@@ -65,6 +59,36 @@ public class QueryTable implements Serializable {
 
     }
 
+    public static boolean[] toBinary(List<Tuple> tuples) throws Exception {
+        if (tuples == null || tuples.isEmpty())
+            return null;
+        int tCount = tuples.size();
+        int tSize = tuples.get(0).schema.size();
+
+        boolean[] tableBits = new boolean[tCount * tSize];
+        int tIdx = 0;
+
+
+        for (Tuple t : tuples) {
+
+            List<Boolean> bitArray = t.serializeToBinary();
+            if (bitArray.size() != tSize) {
+                throw new Exception("Tuple size mismatched! (probably owing to varchars not matching specified length)");
+            }
+
+            for (Boolean b : bitArray) {
+                tableBits[tIdx] = b;
+                ++tIdx;
+            }
+
+
+        }
+
+        return tableBits;
+
+
+    }
+
     public void addTuples(QueryTable src) {
         if (src == null)
             return;
@@ -80,7 +104,6 @@ public class QueryTable implements Serializable {
         Collections.sort(tuples);
     }
 
-
     public String printBitArray(boolean[] bits) {
         StringBuffer buf = new StringBuffer();
         for (boolean b : bits) {
@@ -89,7 +112,6 @@ public class QueryTable implements Serializable {
         }
         return buf.toString();
     }
-
 
     public SecureRelRecordType getSchema() {
         return schema;
@@ -108,7 +130,6 @@ public class QueryTable implements Serializable {
             tuples.remove(tuples.size() - 1);
         }
     }
-
 
     public List<Tuple> tuples() {
         return tuples;
@@ -142,7 +163,6 @@ public class QueryTable implements Serializable {
 
     }
 
-
     public boolean[] toBinary() throws Exception {
         if (tuples == null || tuples.isEmpty())
             return null;
@@ -151,38 +171,6 @@ public class QueryTable implements Serializable {
         return toBinary(tuples);
 
     }
-
-
-    public static boolean[] toBinary(List<Tuple> tuples) throws Exception {
-        if (tuples == null || tuples.isEmpty())
-            return null;
-        int tCount = tuples.size();
-        int tSize = tuples.get(0).schema.size();
-
-        boolean[] tableBits = new boolean[tCount * tSize];
-        int tIdx = 0;
-
-
-        for (Tuple t : tuples) {
-
-            List<Boolean> bitArray = t.serializeToBinary();
-            if (bitArray.size() != tSize) {
-                throw new Exception("Tuple size mismatched! (probably owing to varchars not matching specified length)");
-            }
-
-            for (Boolean b : bitArray) {
-                tableBits[tIdx] = b;
-                ++tIdx;
-            }
-
-
-        }
-
-        return tableBits;
-
-
-    }
-
 
     public int tupleCount() {
         if (tuples == null) {

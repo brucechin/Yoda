@@ -1,5 +1,11 @@
 package org.yoda.db.data;
 
+import org.apache.commons.lang3.StringUtils;
+import org.yoda.db.data.field.Field;
+import org.yoda.db.data.field.FieldFactory;
+import org.yoda.type.SecureRelDataTypeField;
+import org.yoda.type.SecureRelRecordType;
+
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -7,12 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.yoda.db.data.field.Field;
-import org.yoda.db.data.field.FieldFactory;
-import org.yoda.type.SecureRelRecordType;
-import org.yoda.type.SecureRelDataTypeField;
 
 public class Tuple implements Comparator<Tuple>, Comparable<Tuple>, Serializable {
     List<Field> fields;
@@ -73,6 +73,25 @@ public class Tuple implements Comparator<Tuple>, Comparable<Tuple>, Serializable
         }
     }
 
+    public Tuple() {
+        fields = new ArrayList<Field>();
+        schema = new SecureRelRecordType();
+
+
+    }
+
+    // create blank tuple that matches schema
+    public Tuple(SecureRelRecordType schema) throws Exception {
+        fields = new ArrayList<Field>();
+
+        for (SecureRelDataTypeField attr : schema.getAttributes()) {
+            Field f = FieldFactory.get(attr);
+            fields.add(f);
+        }
+
+
+    }
+
     public static boolean[] reverseBits(boolean[] src) {
         int len = src.length;
         boolean[] dst = new boolean[len];
@@ -81,10 +100,6 @@ public class Tuple implements Comparator<Tuple>, Comparable<Tuple>, Serializable
             dst[i] = src[len - i - 1];
 
         return dst;
-    }
-
-    public SecureRelRecordType getSchema() {
-        return schema;
     }
 
     public static List<Tuple> extractTuples(String bools, SecureRelRecordType schema) throws Exception {
@@ -105,23 +120,8 @@ public class Tuple implements Comparator<Tuple>, Comparable<Tuple>, Serializable
 
     }
 
-    public Tuple() {
-        fields = new ArrayList<Field>();
-        schema = new SecureRelRecordType();
-
-
-    }
-
-    // create blank tuple that matches schema
-    public Tuple(SecureRelRecordType schema) throws Exception {
-        fields = new ArrayList<Field>();
-
-        for (SecureRelDataTypeField attr : schema.getAttributes()) {
-            Field f = FieldFactory.get(attr);
-            fields.add(f);
-        }
-
-
+    public SecureRelRecordType getSchema() {
+        return schema;
     }
 
     public void addField(Field f) {
