@@ -1,6 +1,6 @@
 package org.yoda.cloud.generator;
 
-import org.yoda.util.Transaction;
+import org.yoda.db.transaction.Transaction;
 
 public class TpccGen {
     //TODO use this class for random transaction generation and insert into transaction queue.

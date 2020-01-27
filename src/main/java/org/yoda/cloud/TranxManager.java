@@ -1,7 +1,7 @@
 package org.yoda.cloud;
 
 import org.yoda.cloud.generator.TpccGen;
-import org.yoda.util.Transaction;
+import org.yoda.db.transaction.Transaction;
 
 public class TranxManager {
     //TODO use th data from logManager or epochManger for validation phase?

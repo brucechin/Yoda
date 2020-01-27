@@ -1,40 +1,31 @@
 package org.yoda.executor.smc.runnable;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import org.yoda.codegen.smc.DynamicCompiler;
-import org.yoda.config.SystemConfiguration;
-import org.yoda.db.data.QueryTable;
-import org.yoda.db.data.Tuple;
-import org.yoda.executor.config.RunConfig.ExecutionMode;
-import org.yoda.executor.smc.*;
-import org.yoda.executor.smc.io.ArrayManager;
-import org.yoda.util.Utilities;
-
 import com.oblivm.backend.flexsc.CompEnv;
 import com.oblivm.backend.gc.GCSignal;
 import com.oblivm.backend.lang.inter.ISecureRunnable;
 import com.oblivm.backend.lang.inter.Util;
 import com.oblivm.backend.oram.SecureArray;
+import org.yoda.codegen.smc.DynamicCompiler;
+import org.yoda.config.SystemConfiguration;
+import org.yoda.db.data.QueryTable;
+import org.yoda.executor.smc.*;
+import org.yoda.executor.smc.io.ArrayManager;
+import org.yoda.util.Utilities;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 // place for methods entirely duplicated by gen and eva
 public class SMCQLRunnableImpl<T> implements Serializable {
-
+    //all sliced secure execution related API and variables are removed
     ExecutionSegment runSpec;
     ArrayManager<T> dataManager;
-    boolean sliceEnabled = true;
-    Map<String, SlicedSecureQueryTable> sliceInputs;
     Map<String, Double> perfReport;
 
     // single slice key / segment
-    SlicedSecureQueryTable sliceOutput;
-    boolean slicedExecution = true;
     boolean semijoinExecution = true;
-    Tuple executingSliceValue = null; // all slices move in lockstep, so we need only one
     SMCRunnable parent;
     SecureQueryTable lastOutput = null;
     Logger logger;
@@ -48,23 +39,17 @@ public class SMCQLRunnableImpl<T> implements Serializable {
         logger = SystemConfiguration.getInstance().getLogger();
 
         try {
-            slicedExecution = SystemConfiguration.getInstance().getProperty("sliced-execution").equals("true");
             semijoinExecution = SystemConfiguration.getInstance().getProperty("semijoin-execution").equals("true");
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        slicedExecution = slicedExecution && runSpec.rootNode.parentSegment.executionMode == ExecutionMode.Slice;
 
-        if (slicedExecution) {
-            sliceInputs = new HashMap<String, SlicedSecureQueryTable>();
-        }
-
-        logger.info("Running in slicedExecution=" + slicedExecution + " mode.");
 
         parent = runnable;
     }
 
-    public static String getKey(OperatorExecution opEx, boolean isLhs) {
+    public static String getKey(QueryExecution opEx, boolean isLhs) {
         String ret = opEx.packageName;
         ret += isLhs ? "-lhs" : "-rhs";
         return ret;
@@ -73,75 +58,20 @@ public class SMCQLRunnableImpl<T> implements Serializable {
 
     @SuppressWarnings("unchecked")
     public void secureCompute(CompEnv<T> env) throws Exception {
-        if (slicedExecution) {
-            sliceOutput = new SlicedSecureQueryTable(runSpec.rootNode, (CompEnv<GCSignal>) env, parent);
-            List<Tuple> sliceVals = runSpec.sliceValues;
-            for (Tuple t : sliceVals) {
-                runSpec.resetOutput();
-                executingSliceValue = t;
+        //sliced secure execution has been removed because we want to execute all on private fields. There is no public or protected fields now.
+        SecureArray<T> secResult = runOne(runSpec.rootNode, env);
+        GCSignal[] payload = (GCSignal[]) Util.secToIntArray(env, secResult);
+        GCSignal[] nonNulls = (GCSignal[]) secResult.getNonNullEntries();
 
-                SecureArray<T> output = runOneSliced(runSpec.rootNode, env);
+        BasicSecureQueryTable output = new BasicSecureQueryTable(payload, nonNulls, runSpec.rootNode.outSchema, (CompEnv<GCSignal>) env, parent);
+        lastOutput = output;
 
-                if (output != null) {
-                    GCSignal[] payload = (GCSignal[]) Util.secToIntArray(env, output);
-                    GCSignal[] nonNulls = (GCSignal[]) output.getNonNullEntries();
-                    sliceOutput.addSlice(executingSliceValue, payload, nonNulls);
-                }
-            }
-
-            lastOutput = sliceOutput;
-            SecureBufferPool.getInstance().addArray(runSpec.rootNode, sliceOutput); // bypass flattening it until we need to
-        } else {
-            SecureArray<T> secResult = runOne(runSpec.rootNode, env);
-            GCSignal[] payload = (GCSignal[]) Util.secToIntArray(env, secResult);
-            GCSignal[] nonNulls = (GCSignal[]) secResult.getNonNullEntries();
-
-            BasicSecureQueryTable output = new BasicSecureQueryTable(payload, nonNulls, runSpec.rootNode.outSchema, (CompEnv<GCSignal>) env, parent);
-            lastOutput = output;
-        }
     }
 
-    boolean slicesRemain() {
-        if (sliceInputs.isEmpty())  // no runs yet
-            return true;
-
-        SlicedSecureQueryTable firstOne = (SlicedSecureQueryTable) sliceInputs.values().toArray()[0];
-        if (firstOne.hasNext())
-            return true;
-
-        return false;
-    }
-
-    private String addSlicePredicate(String query) {
-        String key = "";
-        try {
-            key = runSpec.sliceSpec.getAttributes().get(0).getName();
-        } catch (Exception e) {
-            return query;
-        }
-
-        int orderByIndex = query.lastIndexOf("ORDER BY");
-        String result = (orderByIndex == -1) ? query : query.substring(0, orderByIndex);
-        String orderBy = (orderByIndex == -1) ? "" : query.substring(orderByIndex);
-
-        String predicate = "(";
-        for (int i = 0; i < runSpec.sliceValues.size(); i++) {
-            Tuple t = runSpec.sliceValues.get(i);
-            String val = t.getField(0).toString();
-
-            if (i > 0)
-                predicate += ", ";
-
-            predicate += val;
-        }
-        predicate += ")";
-
-        return (predicate.equals("()")) ? null : result + " WHERE " + key + " IN " + predicate + " " + orderBy;
-    }
 
     // returns output of run
     @SuppressWarnings("unchecked")
-    SecureArray<T> runOne(OperatorExecution op, CompEnv<T> env) throws Exception {
+    SecureArray<T> runOne(QueryExecution op, CompEnv<T> env) throws Exception {
 
         if (op == null || (op.parentSegment != runSpec)) // != runspec implies that child was computed in another segment
             return null;
@@ -151,14 +81,7 @@ public class SMCQLRunnableImpl<T> implements Serializable {
             return (SecureArray<T>) op.output;
         }
 
-        if (Utilities.isCTE(op)) { // skip ctes
-            return runOne(op.lhsChild, env);
-        }
-
-        if (semijoinExecution && op.getSourceSQL() != null) {
-            op.setSourceSQL(addSlicePredicate(op.getSourceSQL()));
-        }
-
+        //TODO we should delete below lines which execute op's children
         SecureArray<T> lhs = runOne(op.lhsChild, env);
         if (lhs == null) { // get input from outside execution segment
             long start = System.nanoTime();
@@ -184,18 +107,16 @@ public class SMCQLRunnableImpl<T> implements Serializable {
         logger.info(msg);
 
         SecureArray<T> secResult = null;
-        if (Utilities.isMerge(op) && (lhs == null || rhs == null)) { // applies for both null too
-            secResult = (lhs == null) ? rhs : lhs;
-        } else {
-            secResult = runnable.run(lhs, rhs);
-            if (secResult == null)
-                throw new Exception("Null result for " + op.packageName);
 
-            if (secResult.getNonNullEntries() == null) {
-                T[] prevEntries = lhs.getNonNullEntries();
-                secResult.setNonNullEntries(prevEntries);
-            }
+        secResult = runnable.run(lhs, rhs);
+        if (secResult == null)
+            throw new Exception("Null result for " + op.packageName);
+
+        if (secResult.getNonNullEntries() == null) {
+            T[] prevEntries = lhs.getNonNullEntries();
+            secResult.setNonNullEntries(prevEntries);
         }
+
         double end = System.nanoTime();
         double elapsed = (end - start) / 1e9;
 
@@ -216,119 +137,6 @@ public class SMCQLRunnableImpl<T> implements Serializable {
 
     }
 
-
-    @SuppressWarnings("unchecked")
-    SecureArray<T> runOneSliced(OperatorExecution op, CompEnv<T> env) throws Exception {
-        if (op == null || op.parentSegment != runSpec) // != runspec implies that child was computed in another segment, pull this in with parent
-            return null;
-
-        // already exec'd cte
-        if (op.output != null) {
-            return (SecureArray<T>) op.output;
-        }
-
-        if (Utilities.isCTE(op)) { // skip ctes
-            return runOneSliced(op.lhsChild, env);
-        }
-
-
-        SecureArray<T> lhs = runOneSliced(op.lhsChild, env);
-        if (lhs == null) { // get input from outside execution segment
-            String key = getKey(op, true);
-            if (!sliceInputs.containsKey(key)) {
-                SlicedSecureQueryTable allSlices = dataManager.getSliceInputs(op, env, parent, true);
-                sliceInputs.put(key, allSlices);
-            }
-            SlicedSecureQueryTable srcTable = sliceInputs.get(key);
-            if (srcTable != null)
-                lhs = (SecureArray<T>) srcTable.getSlice(executingSliceValue, (CompEnv<GCSignal>) env);
-
-        }
-
-
-        SecureArray<T> rhs = runOneSliced(op.rhsChild, env);
-
-        if (rhs == null) {
-            String key = getKey(op, false);
-            if (!sliceInputs.containsKey(key)) {
-
-                SlicedSecureQueryTable allSlices = dataManager.getSliceInputs(op, env, parent, false);
-                if (allSlices != null)
-                    sliceInputs.put(key, allSlices);
-            }
-            SlicedSecureQueryTable srcTable = sliceInputs.get(key);
-            if (srcTable != null)
-                rhs = (SecureArray<T>) srcTable.getSlice(executingSliceValue, (CompEnv<GCSignal>) env);
-        }
-
-        if (rhs == null && lhs == null)
-            return null;
-
-        double start = System.nanoTime();
-        SecureArray<T> secResult = null;
-        if (Utilities.isMerge(op)) {
-            secResult = mergeRun(op, env, lhs, rhs);
-        } else
-            secResult = slicedRun(op, env, lhs, rhs);
-
-        double end = System.nanoTime();
-        double elapsed = (end - start) / 1e9;
-
-        logger.info("Operator ended at " + Utilities.getTime() + " it ran in " + op.packageName + " ran in " + elapsed + " seconds.");
-
-        if (perfReport.containsKey(op.packageName)) {
-            double oldSum = perfReport.get(op.packageName);
-
-            perfReport.put(op.packageName, oldSum + elapsed);
-        } else
-            perfReport.put(op.packageName, elapsed);
-
-        return secResult;
-
-
-    }
-
-
-    private SecureArray<T> mergeRun(OperatorExecution op, CompEnv<T> env, SecureArray<T> lhs, SecureArray<T> rhs) throws Exception {
-        if (lhs != null && rhs != null) {
-            return slicedRun(op, env, lhs, rhs);
-        }
-        if (lhs != null) {
-            return lhs;
-        }
-        if (rhs != null) {
-
-            return rhs;
-        }
-        throw new Exception("Operator " + op.packageName + " has no input!");
-    }
-
-    @SuppressWarnings("unchecked")
-    private SecureArray<T> slicedRun(OperatorExecution op, CompEnv<T> env, SecureArray<T> lhs, SecureArray<T> rhs) throws Exception {
-        ISecureRunnable<T> runnable = DynamicCompiler.loadClass(op.packageName, op.byteCode, env);
-
-        int lhsLength = lhs != null ? lhs.length : 0;
-        int rhsLength = rhs != null ? rhs.length : 0;
-        String msg = "Operator " + op.packageName + " started at " + Utilities.getTime() + " on " + lhsLength + "," + rhsLength + " tuples.";
-        logger.info(msg);
-
-        SecureArray<T> secResult = null;
-        if (op.packageName.contains("Join") && (lhsLength == 0 || rhsLength == 0)) {
-            secResult = (lhsLength == 0) ? runnable.run(rhs, rhs) : runnable.run(lhs, lhs);
-            secResult = null;
-        } else {
-            secResult = runnable.run(lhs, rhs);
-        }
-
-        if (secResult != null && secResult.getNonNullEntries() == null) {
-            T[] prevEntries = lhs.getNonNullEntries();
-            secResult.setNonNullEntries(prevEntries);
-        }
-
-        dataManager.registerSlicedArray(op, secResult, env, parent, this.executingSliceValue);
-        op.output = (SecureArray<GCSignal>) secResult;
-        return secResult;
-    }
 
     public void prepareOutput(CompEnv<T> env) throws Exception {
         if (runSpec.sliceComplementSQL != null && !runSpec.sliceComplementSQL.isEmpty() && semijoinExecution) {

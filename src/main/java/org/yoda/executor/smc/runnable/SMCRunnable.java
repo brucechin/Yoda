@@ -2,7 +2,7 @@ package org.yoda.executor.smc.runnable;
 
 import org.yoda.db.data.Tuple;
 import org.yoda.executor.smc.ExecutionSegment;
-import org.yoda.executor.smc.OperatorExecution;
+import org.yoda.executor.smc.QueryExecution;
 import org.yoda.executor.smc.SecureQueryTable;
 
 public interface SMCRunnable {
@@ -20,6 +20,6 @@ public interface SMCRunnable {
 
     public SecureQueryTable getOutput();
 
-    public OperatorExecution getRootOperator();
+    public QueryExecution getRootOperator();
 
 }

@@ -1,23 +1,16 @@
 package org.yoda.executor.smc.runnable;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-import org.yoda.db.data.Tuple;
-import org.yoda.executor.smc.ExecutionSegment;
-import org.yoda.executor.smc.OperatorExecution;
-import org.yoda.executor.smc.SecureBufferPool;
-import org.yoda.executor.smc.SecureQueryTable;
 import com.oblivm.backend.flexsc.CompEnv;
 import com.oblivm.backend.util.EvaRunnable;
 import com.oblivm.backend.util.GenRunnable;
 import com.oblivm.backend.util.Utils;
+import org.yoda.db.data.Tuple;
+import org.yoda.executor.smc.ExecutionSegment;
+import org.yoda.executor.smc.QueryExecution;
+import org.yoda.executor.smc.SecureBufferPool;
+import org.yoda.executor.smc.SecureQueryTable;
+
+import java.io.*;
 
 
 public class SMCQLRunnable {
@@ -156,7 +149,7 @@ public class SMCQLRunnable {
 
 
         @Override
-        public OperatorExecution getRootOperator() {
+        public QueryExecution getRootOperator() {
             return runSpec.rootNode;
         }
 
@@ -291,7 +284,7 @@ public class SMCQLRunnable {
 
 
         @Override
-        public OperatorExecution getRootOperator() {
+        public QueryExecution getRootOperator() {
             return runSpec.rootNode;
         }
 

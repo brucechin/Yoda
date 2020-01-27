@@ -1,18 +1,9 @@
 package org.yoda.executor.smc;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import com.oblivm.backend.flexsc.CompEnv;
 import com.oblivm.backend.flexsc.Party;
 import com.oblivm.backend.gc.GCGenComp;
 import com.oblivm.backend.gc.GCSignal;
-
 import org.yoda.config.SystemConfiguration;
 import org.yoda.db.data.QueryTable;
 import org.yoda.db.data.Tuple;
@@ -20,10 +11,14 @@ import org.yoda.executor.config.ConnectionManager;
 import org.yoda.executor.smc.io.SecureOutputReader;
 import org.yoda.executor.smc.runnable.SMCRunnable;
 
+import java.io.Serializable;
+import java.util.*;
+import java.util.logging.Logger;
+
 // singleton for maintaining intermediate results between secure operators
 public class SecureBufferPool implements Serializable {
 
-
+    //TODO each ORAM executor server should have an instance of secure buffer pool
     public static int lengthBits = 32;
     // array produced by a given smc config
     private static Map<String, SecureQueryTable> records;
@@ -55,14 +50,14 @@ public class SecureBufferPool implements Serializable {
         return instance;
     }
 
-    public static String getKey(OperatorExecution op) {
+    public static String getKey(QueryExecution op) {
         Party p = op.getParty();
         String suffix = (p == Party.Alice) ? "-gen" : "-eva";
         return op.packageName + "." + op.getWorkerId() + suffix;
 
     }
 
-    public synchronized void addArray(OperatorExecution op, GCSignal[] value, GCSignal[] length, CompEnv<GCSignal> env, SMCRunnable parent) {
+    public synchronized void addArray(QueryExecution op, GCSignal[] value, GCSignal[] length, CompEnv<GCSignal> env, SMCRunnable parent) {
         String key = getKey(op);
 
         BasicSecureQueryTable table = new BasicSecureQueryTable(value, length, op.outSchema, env, parent);
@@ -77,7 +72,7 @@ public class SecureBufferPool implements Serializable {
 
     }
 
-    public synchronized void addArray(OperatorExecution op, GCSignal[] value, GCSignal[] length, CompEnv<GCSignal> env, SMCRunnable parent, Tuple t) throws Exception {
+    public synchronized void addArray(QueryExecution op, GCSignal[] value, GCSignal[] length, CompEnv<GCSignal> env, SMCRunnable parent, Tuple t) throws Exception {
         String key = getKey(op);
 
         BasicSecureQueryTable val = (value == null) ? null : new BasicSecureQueryTable(value, length, op.outSchema, env, parent);
@@ -94,13 +89,13 @@ public class SecureBufferPool implements Serializable {
 
     }
 
-    public synchronized void addArray(OperatorExecution op, SecureQueryTable table) {
+    public synchronized void addArray(QueryExecution op, SecureQueryTable table) {
         String key = getKey(op);
         records.put(key, table);
 
     }
 
-    public synchronized SecureQueryTable readRecord(OperatorExecution op) {
+    public synchronized SecureQueryTable readRecord(QueryExecution op) {
         String key = getKey(op);
         return readRecord(key);
     }
@@ -194,7 +189,7 @@ public class SecureBufferPool implements Serializable {
 
     // only works in local mode where both halves of the shared secret are here
     // Alice always ends with -gen, Bob, -eva
-    public void printArray(OperatorExecution op) throws Exception {
+    public void printArray(QueryExecution op) throws Exception {
         String aliceKey = getKey(op);
         String baseKey = getPackageName(aliceKey);
 

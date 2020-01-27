@@ -1,5 +1,13 @@
 package org.yoda.executor.plaintext;
 
+import org.yoda.config.SystemConfiguration;
+import org.yoda.db.data.QueryTable;
+import org.yoda.db.data.Tuple;
+import org.yoda.executor.YodaQueryExecutor;
+import org.yoda.executor.config.ConnectionManager;
+import org.yoda.type.SecureRelRecordType;
+import org.yoda.util.Utilities;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,14 +16,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
-
-import org.yoda.config.SystemConfiguration;
-import org.yoda.db.data.QueryTable;
-import org.yoda.db.data.Tuple;
-import org.yoda.executor.SegmentExecutor;
-import org.yoda.executor.config.ConnectionManager;
-import org.yoda.type.SecureRelRecordType;
-import org.yoda.util.Utilities;
 
 // issue queries to one or more psql dbs
 // automatically manages issuing query to all engines in network
@@ -52,17 +52,17 @@ public class SqlQueryExecutor {
 	// just run each query once per data source and concatenate their collective outputs
 	public QueryTable plainQuery(SecureRelRecordType outSchema, String query) throws Exception {
 
-		SegmentExecutor executor = SegmentExecutor.getInstance();
-		List<QueryTable> output = executor.runPlaintext(query, outSchema);
+        YodaQueryExecutor executor = YodaQueryExecutor.getInstance();
+        List<QueryTable> output = executor.runPlaintext(query, outSchema);
 
-		if (output == null || output.isEmpty())
-			return null;
+        if (output == null || output.isEmpty())
+            return null;
 
-		Iterator<QueryTable> itr = output.iterator();
-		QueryTable ret = itr.next();
+        Iterator<QueryTable> itr = output.iterator();
+        QueryTable ret = itr.next();
 
-		while (itr.hasNext()) {
-			QueryTable t = itr.next();
+        while (itr.hasNext()) {
+            QueryTable t = itr.next();
 			ret.addTuples(t);
 		}
 
@@ -70,13 +70,13 @@ public class SqlQueryExecutor {
 	}
 
 	public static QueryTable query(String sql, String workerId) throws Exception {
-		SecureRelRecordType outSchema = Utilities.getOutSchemaFromString(sql);
+        SecureRelRecordType outSchema = Utilities.getOutSchemaFromString(sql);
 
-		SegmentExecutor executor = SegmentExecutor.getInstance();
-		return executor.runPlaintext(workerId, sql, outSchema);
+        YodaQueryExecutor executor = YodaQueryExecutor.getInstance();
+        return executor.runPlaintext(workerId, sql, outSchema);
 
 
-	}
+    }
 
 
 	public static QueryTable query(String sql, SecureRelRecordType outSchema, String workerId) throws Exception {

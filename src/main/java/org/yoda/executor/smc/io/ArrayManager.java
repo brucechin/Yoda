@@ -2,32 +2,30 @@ package org.yoda.executor.smc.io;
 
 import com.oblivm.backend.flexsc.CompEnv;
 import com.oblivm.backend.flexsc.Party;
-import com.oblivm.backend.gc.GCGenComp;
 import com.oblivm.backend.gc.GCSignal;
 import com.oblivm.backend.lang.inter.Util;
 import com.oblivm.backend.oram.SecureArray;
-
-import java.io.Serializable;
-import java.sql.Connection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.yoda.config.SystemConfiguration;
 import org.yoda.db.data.QueryTable;
 import org.yoda.db.data.Tuple;
 import org.yoda.executor.config.ConnectionManager;
 import org.yoda.executor.plaintext.SqlQueryExecutor;
-import org.yoda.executor.smc.*;
+import org.yoda.executor.smc.ExecutionSegment;
+import org.yoda.executor.smc.QueryExecution;
+import org.yoda.executor.smc.SecureBufferPool;
+import org.yoda.executor.smc.SecureQueryTable;
 import org.yoda.executor.smc.runnable.SMCRunnable;
 import org.yoda.util.SMCUtils;
-import org.yoda.util.Utilities;
+
+import java.io.Serializable;
+import java.sql.Connection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 // for use in SMCQLRunnable$Generator, SMCQLRunnable$Evaluator
 public class ArrayManager<T> implements Serializable {
-    Map<OperatorExecution, SecureArray<T>> inputArrays;
+    Map<QueryExecution, SecureArray<T>> inputArrays;
     SecureBufferPool bufferPool;
 
 
@@ -35,19 +33,19 @@ public class ArrayManager<T> implements Serializable {
     Logger logger;
 
     public ArrayManager() throws Exception {
-        inputArrays = new LinkedHashMap<OperatorExecution, SecureArray<T>>();
+        inputArrays = new LinkedHashMap<QueryExecution, SecureArray<T>>();
         bufferPool = SecureBufferPool.getInstance();
         logger = SystemConfiguration.getInstance().getLogger();
     }
 
 
     @SuppressWarnings("unchecked")
-    public SecureArray<T> getInput(OperatorExecution op, boolean isLhs, CompEnv<T> env, SMCRunnable parent) throws Exception {
+    public SecureArray<T> getInput(QueryExecution op, boolean isLhs, CompEnv<T> env, SMCRunnable parent) throws Exception {
 
         if (op == null)
             return null;
 
-        OperatorExecution src = (isLhs) ? op.lhsChild : op.rhsChild;
+        QueryExecution src = op;
         Party party = op.getParty();
         String workerId = op.getWorkerId();
 
@@ -63,11 +61,6 @@ public class ArrayManager<T> implements Serializable {
 
 
         if (src != null) {
-            if (Utilities.isCTE(src)) {
-                OperatorExecution cteSrc = src.lhsChild;
-                if (inputArrays.containsKey(cteSrc))
-                    return inputArrays.get(cteSrc);
-            }
 
             // intermediate result from another execution step
             SecureQueryTable table = bufferPool.readRecord(src.packageName, workerId, party);
@@ -94,74 +87,7 @@ public class ArrayManager<T> implements Serializable {
     }
 
 
-    public SlicedSecureQueryTable getSliceInputs(OperatorExecution op, CompEnv<T> env, SMCRunnable parent, boolean isLhs) throws Exception {
-        if (op == null)
-            return null;
-
-        OperatorExecution src = (isLhs) ? op.lhsChild : op.rhsChild;
-        Party party = op.getParty();
-        String workerId = op.getWorkerId();
-
-        if (op.parentSegment != parent.getSegment()) {
-            throw new Exception("Mismatched operator " + op);
-        }
-
-        if (src != null) {
-
-            // intermediate result from another execution step
-            SecureQueryTable table = bufferPool.readRecord(src.packageName, workerId, party);
-            if (table != null) {
-                return (SlicedSecureQueryTable) table;
-            }
-        }
-
-        if (op.getSourceSQL() != null) {
-            if ((isLhs && party == Party.Alice) || (!isLhs && party == Party.Bob)) {
-                // encode local secure query table
-                SlicedSecureQueryTable local = new SlicedSecureQueryTable(op.outSchema, (CompEnv<GCSignal>) env, parent, false);
-                QueryTable plainInput = queryIt(op);
-
-                Map<Tuple, List<Tuple>> plainSlices = plainInput.asSlices(op.parentSegment.sliceSpec);
-
-                int sliceCount = plainSlices.keySet().size();
-                parent.sendInt(sliceCount);
-                for (Tuple key : plainSlices.keySet()) {
-                    BasicSecureQueryTable table = SMCUtils.prepareLocalPlaintext(key, plainSlices.get(key), env, parent);
-                    table.R = GCGenComp.R;
-                    table.schema = op.outSchema;
-                    local.slices.put(key, table);
-                }
-
-                local.bufferPoolKey = SecureBufferPool.getKey(op);
-                local.resetSliceIterator();
-                return local;
-            } else {
-                // retrieve local half of shared secret for Bob's input - collect remote
-                //
-                SlicedSecureQueryTable remote = new SlicedSecureQueryTable(op.outSchema, (CompEnv<GCSignal>) env, parent, true);
-                int sliceCount = parent.getInt();
-
-                for (int i = 0; i < sliceCount; ++i) {
-                    Pair<Tuple, BasicSecureQueryTable> slice = SMCUtils.prepareRemoteSlicedPlaintext(env, parent);
-                    BasicSecureQueryTable table = slice.getRight();
-                    table.schema = op.outSchema;
-                    table.R = GCGenComp.R;
-                    remote.slices.put(slice.getLeft(), table);
-                }
-                remote.resetSliceIterator();
-                return remote;
-
-            }
-
-        }
-
-
-        return null;
-
-    }
-
-
-    public void registerArray(OperatorExecution srcOp, SecureArray<T> arr, CompEnv<T> env, SMCRunnable parent) throws Exception {
+    public void registerArray(QueryExecution srcOp, SecureArray<T> arr, CompEnv<T> env, SMCRunnable parent) throws Exception {
         inputArrays.put(srcOp, arr);
 
         T[] dstArray = (arr == null) ? null : Util.secToIntArray(env, arr);
@@ -170,7 +96,7 @@ public class ArrayManager<T> implements Serializable {
         bufferPool.addArray(srcOp, (GCSignal[]) dstArray, (GCSignal[]) length, (CompEnv<GCSignal>) env, parent);
     }
 
-    public void registerSlicedArray(OperatorExecution srcOp, SecureArray<T> arr, CompEnv<T> env, SMCRunnable parent, Tuple t) throws Exception {
+    public void registerSlicedArray(QueryExecution srcOp, SecureArray<T> arr, CompEnv<T> env, SMCRunnable parent, Tuple t) throws Exception {
         inputArrays.put(srcOp, arr);
 
         T[] dstArray = (arr == null) ? null : Util.secToIntArray(env, arr);
@@ -179,7 +105,7 @@ public class ArrayManager<T> implements Serializable {
         bufferPool.addArray(srcOp, (GCSignal[]) dstArray, (GCSignal[]) length, (CompEnv<GCSignal>) env, parent, t);
     }
 
-    public boolean hasArray(OperatorExecution op, SMCRunnable parent) {
+    public boolean hasArray(QueryExecution op, SMCRunnable parent) {
         ExecutionSegment segment = parent.getSegment(); // reference parent segment because sometimes we draw from other segments
         String workerId = segment.workerId;
         Party p = segment.party;
@@ -195,12 +121,12 @@ public class ArrayManager<T> implements Serializable {
     }
 
 
-    public SecureArray<T> prepareLocalPlainData(OperatorExecution o, CompEnv<T> env, SMCRunnable parent) throws Exception {
+    public SecureArray<T> prepareLocalPlainData(QueryExecution o, CompEnv<T> env, SMCRunnable parent) throws Exception {
         QueryTable table = queryIt(o);
         return SMCUtils.prepareLocalPlainArray(table, env, parent);
     }
 
-    private QueryTable queryIt(OperatorExecution op) throws Exception {
+    private QueryTable queryIt(QueryExecution op) throws Exception {
         ConnectionManager cm = ConnectionManager.getInstance();
         Connection c = cm.getConnection(op.getWorkerId());
         double start = System.nanoTime();

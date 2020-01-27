@@ -1,0 +1,8 @@
+package $packageName;
+
+//simple lcc code for select tax from warehouse where w_id = ?;
+
+$structName $tupleName;
+
+//replace $ with number of tuple bits
+int$size[n] output;

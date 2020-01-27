@@ -9,11 +9,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.yoda.config.SystemConfiguration;
 import org.yoda.db.schema.SecureSchemaLookup;
-import org.yoda.executor.smc.OperatorExecution;
-import org.yoda.plan.SecureRelRoot;
 import org.yoda.type.SecureRelDataTypeField;
 import org.yoda.type.SecureRelDataTypeField.SecurityPolicy;
-import org.yoda.type.SecureRelRecordType;
 
 import java.io.*;
 import java.net.URL;
@@ -101,21 +98,6 @@ public class Utilities {
         return Files.readAllBytes(p);
     }
 
-
-    public static SecureRelRecordType getOutSchemaFromString(String sql) throws Exception {
-        SecureRelRoot relRoot = new SecureRelRoot("anonymous", sql);
-
-        return relRoot.getPlanRoot().getSchema();
-
-    }
-
-
-    public static boolean isCTE(OperatorExecution src) {
-        String packageName = src.packageName;
-        String pkg = packageName.substring(packageName.lastIndexOf('.') + 1);
-        pkg = pkg.replaceAll("\\d", "");
-        return pkg.equals("CommonTableExpressionScan");
-    }
 
     public static void mkdir(String path) throws Exception {
 
@@ -209,11 +191,6 @@ public class Utilities {
     }
 
 
-    public static boolean isMerge(OperatorExecution op) {
-        if (op.packageName.endsWith(".merge"))
-            return true;
-        return false;
-    }
 
 
     public static SecureRelDataTypeField lookUpAttribute(String table, String attr) throws Exception {

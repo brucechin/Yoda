@@ -1,6 +1,5 @@
 package org.yoda.executor.smc.merge;
 
-import org.yoda.executor.smc.OperatorExecution;
 import org.yoda.type.SecureRelDataTypeField;
 import org.yoda.util.Utilities;
 

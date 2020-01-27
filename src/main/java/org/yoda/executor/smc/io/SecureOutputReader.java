@@ -1,19 +1,17 @@
 package org.yoda.executor.smc.io;
 
+import com.oblivm.backend.gc.GCSignal;
+import org.yoda.db.data.QueryTable;
+import org.yoda.db.data.Tuple;
+import org.yoda.executor.smc.BasicSecureQueryTable;
+import org.yoda.executor.smc.SecureBufferPool;
+import org.yoda.type.SecureRelRecordType;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-
-import org.yoda.db.data.QueryTable;
-import org.yoda.db.data.Tuple;
-import org.yoda.executor.smc.BasicSecureQueryTable;
-import org.yoda.type.SecureRelRecordType;
-import org.yoda.executor.smc.SecureBufferPool;
-import org.yoda.executor.smc.SlicedSecureQueryTable;
-
-import com.oblivm.backend.gc.GCSignal;
 
 public class SecureOutputReader {
 

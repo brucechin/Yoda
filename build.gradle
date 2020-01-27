@@ -8,6 +8,7 @@ version '1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -26,4 +27,8 @@ dependencies {
     compile group: 'org.gridkit.lab', name: 'nanocloud', version: '0.8.11'
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12
     testCompile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.21'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+
+
 }

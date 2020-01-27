@@ -1,6 +1,6 @@
 package org.yoda.cloud;
 
-import org.yoda.util.Transaction;
+import org.yoda.db.transaction.Transaction;
 
 import java.util.List;
 import java.util.Queue;
