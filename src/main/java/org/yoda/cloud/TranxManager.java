@@ -5,8 +5,8 @@ import org.yoda.db.transaction.Transaction;
 
 public class TranxManager {
     //TODO use th data from logManager or epochManger for validation phase?
-    LogManager logManager_;
-    EpochManager epochManager_;
+
+
     BatchManager batchManager_;
     TpccGen generator_;
 
