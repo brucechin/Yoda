@@ -15,17 +15,11 @@ public class TranxManager {
     }
 
 
-    public boolean validateTranx(Transaction t) {
-        //TODO use write read set for validation
-        return true;
-    }
-
-
     public void recovery() {
         //use logManager for failure recovery
     }
 
-    public void tranxArrival() {
-        //an individual thread to generating transactions and push_back to tranxQueue
-    }
+//    public void tranxArrival() {
+//        //an individual thread to generating transactions and push_back to tranxQueue
+//    }
 }

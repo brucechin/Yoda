@@ -1,14 +1,13 @@
 package org.yoda.cloud.storage;
 
 import java.util.HashMap;
-import java.util.List;
 
-public class ORAM {
+public class OPRAM {
     HashMap<Integer, Integer> positionMap_;
-    List<Tuple> stash_;
+    //    List<Tuple> stash_;
     SecretShareStorage secretShareStorage_;
 
-    public ORAM() {
+    public OPRAM() {
 
     }
 

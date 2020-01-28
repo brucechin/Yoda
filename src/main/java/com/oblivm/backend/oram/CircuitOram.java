@@ -113,6 +113,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements java.io.Ser
     public T[] read(T[] scIden, boolean[] pos, T[] scNewPos) {
         scIden = Arrays.copyOf(scIden, lengthOfIden);
         T[] r = readAndRemove(scIden, pos, false);
+        //TODO in Yoda, we need to split the readAndRemove and putBack into different phases.
         putBack(scIden, scNewPos, r);
         return r;
     }

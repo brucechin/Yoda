@@ -1,7 +1,7 @@
 package org.yoda.cloud;
 
 public class LogManager {
-    public static LogManager instance;
+    public static LogManager instance_;
     boolean is_running_;
 
     public LogManager() {
@@ -9,8 +9,8 @@ public class LogManager {
     }
 
     public static LogManager getInstance() {
-        instance = new LogManager();
-        return instance;
+        instance_ = new LogManager();
+        return instance_;
     }
 
     public boolean getStatus() {

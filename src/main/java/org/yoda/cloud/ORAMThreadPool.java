@@ -1,16 +1,16 @@
 package org.yoda.cloud;
 
-import org.yoda.cloud.storage.ORAM;
+import org.yoda.cloud.storage.OPRAM;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class ORAMThreadPool<Job extends Runnable> {
     //use this pool to execute QueryTasks in the queue
-    private int numORAM_;
     private ThreadPoolExecutor threadPool_;
     private boolean running_;
-    private List<ORAM> oramExecutors_;
+    private int degreeOfParallelism_;
+    private HashMap<String, OPRAM> OPRAMExecutor_;
 
     public ORAMThreadPool() {
         //threadPool_ = new ThreadPoolExecutor();

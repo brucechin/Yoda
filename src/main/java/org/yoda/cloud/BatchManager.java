@@ -3,13 +3,11 @@ package org.yoda.cloud;
 import org.yoda.db.transaction.Transaction;
 
 import java.util.List;
-import java.util.Queue;
 
 public class BatchManager {
     TranxQueue queue_;
     private List<Transaction> runningTranx;
     EpochManager epochManager_;
-    private Queue<String> operationQueue; //I/O operations waiting for submitting to ORAM servers for org.yoda.execution
     private int batchSize;
 
 
@@ -29,13 +27,21 @@ public class BatchManager {
 
     }
 
-    public void abortTranx(Transaction t) {
+    public boolean validateTranx(Transaction t) {
+        //TODO use write read set for validation
+        return true;
+    }
 
+    public void abortTranx(Transaction t) {
+        //TODO undo the operations
     }
 
     public void submitBatchOp(List<String> batch) {
         epochManager_.epochQueue.add(batch);
     }
 
+    public void pullFromTranxQueue(int num) {
+        //TODO pull num transactions from tranxqueue
+    }
 
 }
