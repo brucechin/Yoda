@@ -1,44 +1,50 @@
 package org.yoda.cloud;
 
+import lombok.NonNull;
 import org.yoda.db.transaction.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class TranxQueue {
-    int size_;
-    Queue<Transaction> queue_;
-    Lock lock_;
+    LinkedBlockingQueue<Transaction> queue_;
+
+    public TranxQueue() {
+        queue_ = new LinkedBlockingQueue<>();
+    }
 
     public void tranxReorder(int len) {
         //reorder the order of top len transactions in the queue to minimize the potential conflicts
     }
 
 
-    public boolean insertTranx(Transaction t) {
-        //concurrently insert transactions to queue.
-        //TODO use thread-safe queue to implement it lock-free
-        lock_.lock();
-        queue_.offer(t);
-        lock_.unlock();
-        return true;
+    /**
+     * concurrently insert transactions to queue.
+     * @param t The transaction to be added
+     * @return the status of insert
+     */
+    public boolean insertTranx(@NonNull Transaction t) {
+        return queue_.offer(t);
     }
 
+    /**
+     * Is the queue empty
+     * @return the status of queue
+     */
     public boolean isEmpty() {
         return queue_.isEmpty();
     }
 
+    /**
+     * Pop the given number of transactions
+     * @param num the number of transactions to be popped
+     * @return a {@link List} of transactions
+     */
     public List<Transaction> popTransactions(int num) {
+        assert num > 0;
         List<Transaction> list = new ArrayList<>();
-        int count = 0;
-        lock_.lock();
-        while (!queue_.isEmpty() && count < num) {
-            Transaction t = queue_.poll();
-            list.add(t);
-        }
-        lock_.unlock();
+        queue_.drainTo(list, num);
         return list;
     }
 }

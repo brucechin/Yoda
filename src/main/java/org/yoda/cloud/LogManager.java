@@ -4,12 +4,18 @@ public class LogManager {
     public static LogManager instance_;
     boolean is_running_;
 
-    public LogManager() {
-
+    private LogManager() {
+        is_running_ = false;
     }
 
     public static LogManager getInstance() {
-        instance_ = new LogManager();
+        if (instance_ == null) {
+            synchronized(LogManager.class) {
+                if (instance_ == null) {
+                    instance_ = new LogManager();
+                }
+            }
+        }
         return instance_;
     }
 

@@ -2,6 +2,7 @@ package org.yoda.cloud;
 
 import org.yoda.db.transaction.Transaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BatchManager {
@@ -11,8 +12,17 @@ public class BatchManager {
     private int batchSize;
 
 
-    BatchManager() {
+    /**
+     *
+     * @param batchSize batch size must be greater than 0
+     */
+    BatchManager(int batchSize) {
+        assert batchSize > 0;
 
+        queue_ = new TranxQueue();
+        runningTranx = new ArrayList<>();
+        epochManager_ = new EpochManager();
+        batchSize = batchSize;
     }
 
     public void removeTranx(Transaction t) {
